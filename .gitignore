@@ -1,0 +1,34 @@
+# ignore everything
+*
+
+# except .gitignore
+!.gitignore
+
+# and some directories
+!.*/
+!.config/*/
+!.local/*/
+!.local/*/*/
+!.local/*/*/*/
+
+# and some files
+!.signature
+!.config/alacritty/alacritty.yml
+!.config/gtk-3.0/settings.ini
+!.config/helix/config.toml
+!.config/himalaya/config.toml
+!.config/home-manager/home.nix
+!.config/mpv/input.conf
+!.config/mpv/mpv.conf
+!.config/nvim/init.lua
+!.config/picom/picom.conf
+!.config/python/startup.py
+!.config/stylua/stylua.toml
+!.config/sx/sxrc
+!.config/sx/xresources
+!.config/tmux/tmux.conf
+!.config/xmonad/bar.hs
+!.config/xmonad/xmonad.hs
+!.config/yt-dlp/config
+
+!.local/share/icons/default/index.theme
