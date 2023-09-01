@@ -1,0 +1,20 @@
+[iCloud.folder-aliases]
+trash = "Deleted Messages"
+
+[iCloud]
+backend = "imap"
+email = "c.j.bayliss@icloud.com"
+default = true
+display-name = "Christopher Bayliss"
+sender = "smtp"
+smtp-host = "smtp.mail.me.com"
+smtp-port = 587
+smtp-ssl = true
+smtp-login = "c.j.bayliss@icloud.com"
+smtp-passwd-cmd = "pass show himalaya"
+sync = false
+imap-host = "imap.mail.me.com"
+imap-port = 993
+imap-ssl = true
+imap-login = "c.j.bayliss@icloud.com"
+imap-passwd-cmd = "pass show himalaya"

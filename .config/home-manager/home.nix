@@ -232,7 +232,7 @@ in
     XDG_DATA_HOME = "$HOME/.local/share";
 
     PYTHONSTARTUP = "$XDG_CONFIG_HOME/python/startup.py";
-    PASSWORD_STORE_DIR = "$XDG_DATA_HOME/pass";
+    PASSWORD_STORE_DIR = "$HOME/.local/share/pass";
     MOZ_GTK_TITLEBAR_DECORATION = "system"; # proper theming
     MOZ_USE_XINPUT2 = "1";
 
