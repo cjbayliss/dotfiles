@@ -55,17 +55,21 @@ in
     stylua
 
     # tools
+    any-nix-shell
     appimage-run
+    bubblewrap
     ffmpeg
     git
     hexyl
     himalaya
     neovim
+    nu_scripts
     pandoc
     pass
     playerctl
     podman-compose
     protonup
+    ratpoison
     scrot
     tmux
     unzip
@@ -98,84 +102,114 @@ in
     #   org.gradle.daemon.idletimeout=3600000
     # '';
   };
+
+  programs.starship = {
+    enable = true;
+    enableFishIntegration = true;
+    enableNushellIntegration = true;
+    settings = {
+      add_newline = false;
+      character = {
+        format = "» ";
+      };
+      cmd_duration = {
+        disabled = true;
+      };
+      directory = {
+        fish_style_pwd_dir_length = 1;
+        format = "[$path]($style) ";
+        style = "bright-cyan";
+        truncate_to_repo = false;
+        truncation_length = 1;
+      };
+
+      git_branch = {
+        format = "[$branch]($style) ";
+        style = "bright-purple";
+      };
+      git_commit = {
+        format = "(\\($hash$tag\\) )";
+      };
+      git_status = {
+        format = "([$all_status$ahead_behind]($style) )";
+        style = "purple";
+        conflicted = "!!";
+        deleted = "D";
+        modified = "M";
+        renamed = "R";
+        staged = "M";
+      };
+
+      hostname = {
+        format = "[$hostname](bright-white) ";
+        ssh_only = false;
+      };
+      line_break = {
+        disabled = true;
+      };
+      status = {
+        disabled = false;
+        format = "[$status]($style) ";
+      };
+      nix_shell = {
+        format = "[\\[nix-$name\\]]($style) ";
+        style = "bold bright-red";
+      };
+      format = "$nix_shell\$hostname\$directory\$git_branch\$git_commit\$git_state\$git_status\$env_var\$status\$character";
+
+    };
+  };
+
+  programs.nushell = {
+    enable = true;
+    configFile = {
+      text = ''
+        $env.config = {
+          show_banner: false
+        }
+
+        use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/git/git-completions.nu *
+        use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/nix/nix-completions.nu *
+      '';
+    };
+  };
+
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
-        set fish_greeting
+      set fish_greeting
+      any-nix-shell fish | source
 
-        # allow urls with '?' in them
-        set -U fish_features qmark-noglob
+      # allow urls with '?' in them
+      set -U fish_features qmark-noglob
 
-        # colors
-        set -U fish_color_autosuggestion      brblue
-        set -U fish_color_cancel              -r
-        set -U fish_color_command             'white' '--bold'
-        set -U fish_color_comment             brblue
-        set -U fish_color_cwd                 brcyan
-        set -U fish_color_cwd_root            red
-        set -U fish_color_end                 brmagenta
-        set -U fish_color_error               brred
-        set -U fish_color_escape              brcyan
-        set -U fish_color_history_current     --bold
-        set -U fish_color_host                normal
-        set -U fish_color_match               --background=brblue
-        set -U fish_color_normal              normal
-        set -U fish_color_operator            normal
-        set -U fish_color_param               normal
-        set -U fish_color_quote               yellow
-        set -U fish_color_redirection         bryellow
-        set -U fish_color_search_match        'bryellow' '--background=brblack'
-        set -U fish_color_selection           'white' '--bold' '--background=brblack'
-        set -U fish_color_status              red
-        set -U fish_color_user                green
-        set -U fish_color_valid_path          --underline
-        set -U fish_pager_color_completion    normal
-        set -U fish_pager_color_description   yellow
-        set -U fish_pager_color_prefix        'white' '--bold' '--underline'
-        set -U fish_pager_color_progress      '-r' 'white'
-
-        # prompt
-        function __git_branch
-            git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/'
-        end
-
-        function __git_status
-            if [ (git ls-files 2>/dev/null | wc -l) -lt 2000 ]
-                git status --short 2>/dev/null | sed 's/^ //g' | cut -d' ' -f1 | sort -u | tr -d '\n' | sed 's/^/ /'
-            else
-                printf " [NOSTAT]"
-            end
-        end
-
-        function fish_right_prompt
-            set -l last_status $status
-            if [ $last_status -ne 0 ]
-                set_color --bold $fish_color_error
-                printf '%s ' $last_status
-                set_color normal
-            end
-        end
-
-      function fish_prompt
-          # host
-          set_color normal
-          printf '%s ' (prompt_hostname)
-
-          # pwd
-          set_color $fish_color_cwd
-          echo -n (prompt_pwd)
-          set_color normal
-
-          # git stuff
-          set_color brmagenta
-          printf '%s' (__git_branch)
-          set_color magenta
-          printf '%s ' (__git_status)
-          set_color normal
-
-          # prompt delimiter
-          echo -n '» '
-      end
+      # colors
+      set -U fish_color_autosuggestion      brblue
+      set -U fish_color_cancel              -r
+      set -U fish_color_command             'white' '--bold'
+      set -U fish_color_comment             brblue
+      set -U fish_color_cwd                 brcyan
+      set -U fish_color_cwd_root            red
+      set -U fish_color_end                 brmagenta
+      set -U fish_color_error               brred
+      set -U fish_color_escape              brcyan
+      set -U fish_color_history_current     --bold
+      set -U fish_color_host                normal
+      set -U fish_color_match               --background=brblue
+      set -U fish_color_normal              normal
+      set -U fish_color_operator            normal
+      set -U fish_color_param               normal
+      set -U fish_color_quote               yellow
+      set -U fish_color_redirection         bryellow
+      set -U fish_color_search_match        'bryellow' '--background=brblack'
+      set -U fish_color_selection           'white' '--bold' '--background=brblack'
+      set -U fish_color_status              red
+      set -U fish_color_user                green
+      set -U fish_color_valid_path          --underline
+      set -U fish_pager_color_completion    normal
+      set -U fish_pager_color_description   yellow
+      set -U fish_pager_color_prefix        'white' '--bold' '--underline'
+      set -U fish_pager_color_progress      '-r' 'white'
     '';
 
     loginShellInit = ''
