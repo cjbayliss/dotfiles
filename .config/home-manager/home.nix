@@ -12,7 +12,7 @@ in
   xdg = {
     enable = true;
 
-    cacheHome = "/tmp/cache";
+    cacheHome = "${config.home.homeDirectory}/.local/cache";
     configHome = "${config.home.homeDirectory}/.config";
     dataHome = "${config.home.homeDirectory}/.local/share";
 
