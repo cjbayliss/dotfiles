@@ -24,8 +24,6 @@
 !.config/picom/picom.conf
 !.config/python/startup.py
 !.config/stylua/stylua.toml
-!.config/sx/sxrc
-!.config/sx/xresources
 !.config/tmux/tmux.conf
 !.config/xmonad/bar.hs
 !.config/xmonad/xmonad.hs

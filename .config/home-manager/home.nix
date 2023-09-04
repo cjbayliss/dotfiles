@@ -9,7 +9,12 @@ in
 {
   home.username = "cjb";
   home.homeDirectory = "/home/cjb";
-  xdg.cacheHome = "/tmp/cache";
+  xdg = {
+    enable = true;
+    cacheHome = "/tmp/cache";
+    configHome = "${config.home.homeDirectory}/.config";
+    dataHome = "${config.home.homeDirectory}/.local/share";
+  };
 
   home.stateVersion = "23.05";
 
@@ -88,19 +93,43 @@ in
     mpv-with-mpris
   ];
 
-  # Home Manager is pretty good at managing dotfiles. The primary way to manage
-  # plain files is through 'home.file'.
   home.file = {
-    # # Building this configuration will create a copy of 'dotfiles/screenrc' in
-    # # the Nix store. Activating the configuration will then make '~/.screenrc' a
-    # # symlink to the Nix store copy.
-    # ".screenrc".source = dotfiles/screenrc;
+    ".config/sx/sxrc".text = ''
+      #!/bin/sh
+      source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
+      xrdb -load "$XDG_CONFIG_HOME/sx/xresources"
 
-    # # You can also set the file content immediately.
-    # ".gradle/gradle.properties".text = ''
-    #   org.gradle.console=verbose
-    #   org.gradle.daemon.idletimeout=3600000
-    # '';
+      # systemctl --user restart redshift
+      systemctl --user restart picom
+
+      if test -z "$DBUS_SESSION_BUS_ADDRESS"; then
+          eval $(dbus-launch --exit-with-session --sh-syntax)
+      fi
+
+      systemctl --user import-environment DISPLAY XAUTHORITY
+
+      if command -v dbus-update-activation-environment >/dev/null 2>&1; then
+          dbus-update-activation-environment DISPLAY XAUTHORITY
+      fi
+
+      xmonad
+    '';
+    ".config/sx/sxrc".executable = true;
+  };
+
+  xresources = {
+    path = "${config.xdg.configHome}/sx/xresources";
+    properties = {
+      "Xcursor.size" = 24;
+      "Xcursor.theme" = "Yaru";
+
+      "Xft.dpi" = 96;
+      "Xft.autohint" = 0;
+      "Xft.lcdfilter" = "lcddefault";
+      "Xft.hintstyle" = "hintslight";
+      "Xft.hinting" = 1;
+      "Xft.antialias" = 1;
+    };
   };
 
   programs.starship = {
@@ -226,10 +255,6 @@ in
     XDG_MUSIC_DIR = "$HOME/music";
     XDG_PICTURES_DIR = "$HOME/pictures";
     XDG_VIDEOS_DIR = "$HOME/videos";
-
-    XDG_CONFIG_HOME = "$HOME/.config";
-    XDG_CACHE_HOME = "/tmp/cache";
-    XDG_DATA_HOME = "$HOME/.local/share";
 
     PYTHONSTARTUP = "$XDG_CONFIG_HOME/python/startup.py";
     PASSWORD_STORE_DIR = "$HOME/.local/share/pass";
