@@ -11,9 +11,24 @@ in
   home.homeDirectory = "/home/cjb";
   xdg = {
     enable = true;
+
     cacheHome = "/tmp/cache";
     configHome = "${config.home.homeDirectory}/.config";
     dataHome = "${config.home.homeDirectory}/.local/share";
+
+    userDirs.enable = true;
+    userDirs.createDirectories = true;
+
+    userDirs.desktop = "${config.home.homeDirectory}/stuff/desktop";
+    userDirs.documents = "${config.home.homeDirectory}/stuff";
+    userDirs.download = "${config.home.homeDirectory}/downloads";
+    userDirs.music = "${config.home.homeDirectory}/music";
+    userDirs.pictures = "${config.home.homeDirectory}/pictures";
+    userDirs.videos = "${config.home.homeDirectory}/videos";
+
+    # disable these
+    userDirs.publicShare = null;
+    userDirs.templates = null;
   };
 
   home.stateVersion = "23.05";
@@ -94,6 +109,34 @@ in
   ];
 
   home.file = {
+    # if you are a python developer or someone else considering writing
+    # files into peoples home directory, PLEASE allow people to at least
+    # turn it off, at a bare minimum.  providing a way to change where the
+    # files are written is polite too!
+    #
+    # no, readline.set_auto_history(False) doesnt stop python writing
+    # ~/.python_history, it just stops python adding history to that file.
+    #
+    # refs:
+    #
+    #   * https://bugs.python.org/issue5845
+    #   * https://bugs.python.org/issue20886
+    #   * https://bugs.python.org/issue26870
+    #   * https://bugs.python.org/issue29779
+    #   * https://bugs.python.org/issue41563
+    #   * https://docs.python.org/3/library/readline.html#example
+    #   * https://github.com/python/cpython/pull/13208
+    #   * https://unix.stackexchange.com/a/297834
+    ".config/python/startup.py".text = ''
+      try:
+          import readline
+          readline.write_history_file = lambda *args: None
+          del readline
+      except ImportError:
+          pass
+    '';
+
+    # xorg config
     ".config/sx/sxrc".text = ''
       #!/bin/sh
       source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
@@ -249,15 +292,8 @@ in
   };
 
   home.sessionVariables = {
-    XDG_DESKTOP_DIR = "$HOME/stuff/desktop";
-    XDG_DOCUMENTS_DIR = "$HOME/stuff";
-    XDG_DOWNLOAD_DIR = "$HOME/downloads";
-    XDG_MUSIC_DIR = "$HOME/music";
-    XDG_PICTURES_DIR = "$HOME/pictures";
-    XDG_VIDEOS_DIR = "$HOME/videos";
-
-    PYTHONSTARTUP = "$XDG_CONFIG_HOME/python/startup.py";
-    PASSWORD_STORE_DIR = "$HOME/.local/share/pass";
+    PYTHONSTARTUP = "${config.xdg.configHome}/python/startup.py";
+    PASSWORD_STORE_DIR = "${config.xdg.dataHome}/pass";
     MOZ_GTK_TITLEBAR_DECORATION = "system"; # proper theming
     MOZ_USE_XINPUT2 = "1";
 

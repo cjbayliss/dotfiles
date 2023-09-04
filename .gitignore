@@ -22,7 +22,6 @@
 !.config/mpv/mpv.conf
 !.config/nvim/init.lua
 !.config/picom/picom.conf
-!.config/python/startup.py
 !.config/stylua/stylua.toml
 !.config/tmux/tmux.conf
 !.config/xmonad/bar.hs
