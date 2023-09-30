@@ -2,8 +2,6 @@
 
 with pkgs;
 let
-  chromium = (ungoogled-chromium.override { commandLineArgs = ''--no-referrers --js-flags="--jitless --noexpose_wasm" --no-pings ''; });
-  mpv-with-mpris = (mpv.override { scripts = [ mpvScripts.mpris ]; });
   python = python3.withPackages (pp: with pp; [ flake8 notify2 pylint ]);
 in
 {
@@ -43,16 +41,11 @@ in
     aspell
     aspellDicts.en
     dmenu
-    git-filter-repo
     hsetroot
     mangohud
-    opusTools
-    pciutils
     pulseaudio # for pactl
     sx
-    universal-ctags
     xmobar
-    yaru-theme
 
     # langs
     chicken
@@ -76,36 +69,23 @@ in
 
     # tools
     any-nix-shell
-    appimage-run
     bubblewrap
-    ffmpeg
-    git
-    hexyl
-    himalaya
     neovim
-    nu_scripts
-    pandoc
-    pass
     playerctl
     podman-compose
-    protonup
-    ratpoison
     scrot
     tmux
-    unzip
-    w3m
-    wget
-    winePackages.stagingFull
-    winetricks
-    yt-dlp
 
     # gui
-    alacritty
-    chromium
+    (ungoogled-chromium.override { commandLineArgs = ''--js-flags="--jitless --noexpose_wasm" --no-pings ''; })
+    bottles
     discord
     firefox
+    heroic
     j4-dmenu-desktop
-    mpv-with-mpris
+
+    # games
+    openmw
   ];
 
   home.file = {
@@ -160,6 +140,36 @@ in
     ".config/sx/sxrc".executable = true;
   };
 
+  gtk = {
+    enable = true;
+
+    cursorTheme = {
+      name = "Yaru";
+      package = pkgs.yaru-theme;
+    };
+
+    font = {
+      name = "Inter";
+      package = pkgs.inter;
+      size = 11;
+    };
+
+    iconTheme = {
+      name = "Yaru";
+      package = pkgs.yaru-theme;
+    };
+
+    theme = {
+      name = "Yaru";
+      package = pkgs.yaru-theme;
+    };
+
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+      gtk-decoration-layout = "menu:";
+    };
+  };
+
   xresources = {
     path = "${config.xdg.configHome}/sx/xresources";
     properties = {
@@ -172,6 +182,76 @@ in
       "Xft.hintstyle" = "hintslight";
       "Xft.hinting" = 1;
       "Xft.antialias" = 1;
+    };
+  };
+
+  programs.git = {
+    enable = true;
+    userEmail = "cjbdev@icloud.com";
+    userName = "Christopher Bayliss";
+  };
+
+  programs.mpv = {
+    enable = true;
+    package = (pkgs.mpv.override { scripts = [ mpvScripts.mpris ]; });
+
+    bindings = {
+      "q" = "stop";
+      "Ctrl+w" = "ignore";
+      "Ctrl+q" = "ignore";
+    };
+
+    config = {
+      script-opts = "ytdl_hook-ytdl_path=yt-dlp";
+      ytdl-format = "[format_id*=adaptive_hls-audio-jaJP][height<=?1080]/bestvideo[height<=?1080]+bestaudio/best";
+      slang = "eng,en,enUS";
+      cache = "auto";
+      embeddedfonts = "no";
+    };
+  };
+
+  programs.alacritty = {
+    enable = true;
+    settings = {
+      font = {
+        size = 11.5;
+      };
+
+      cursor = {
+        blink_interval = 500;
+        style = {
+          blinking = "Always";
+          shape = "Underline";
+        };
+      };
+
+      # https://gitlab.com/protesilaos/dotfiles/-/raw/487affab/emacs/.emacs.d/prot-lisp/modus-themes-exporter.el
+      colors = {
+        bright = {
+          black = "#595959";
+          blue = "#79a8ff";
+          cyan = "#6ae4b9";
+          green = "#70b900";
+          magenta = "#b6a0ff";
+          red = "#ef8b50";
+          white = "#ffffff";
+          yellow = "#c0c530";
+        };
+        normal = {
+          black = "#000000";
+          blue = "#2fafff";
+          cyan = "#00d3d0";
+          green = "#44bc44";
+          magenta = "#feacd0";
+          red = "#ff8059";
+          white = "#bfbfbf";
+          yellow = "#d0bc00";
+        };
+        primary = {
+          background = "#000000";
+          foreground = "#ffffff";
+        };
+      };
     };
   };
 
@@ -232,20 +312,6 @@ in
     };
   };
 
-  programs.nushell = {
-    enable = true;
-    configFile = {
-      text = ''
-        $env.config = {
-          show_banner: false
-        }
-
-        use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/git/git-completions.nu *
-        use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/nix/nix-completions.nu *
-      '';
-    };
-  };
-
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
@@ -288,6 +354,18 @@ in
       if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]
           exec sx
       end
+    '';
+  };
+
+  programs.yt-dlp = {
+    enable = true;
+    extraConfig = ''
+      # this means 'keep downloading the rest of the playlist even is one item on the
+      # list fails'
+      --ignore-errors
+
+      # select the optimal format for my desktop
+      -f [format_id*=adaptive_hls-audio-jaJP][height<=?1080]/bestvideo[ext=webm][height<=?1080]+bestaudio[ext=webm]/best
     '';
   };
 
