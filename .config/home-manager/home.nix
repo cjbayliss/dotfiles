@@ -52,6 +52,7 @@ in
     fennel
     gcc
     ghc
+    nodejs_20
     php
     python
     sbcl

@@ -135,12 +135,7 @@ packer.startup(function()
     })
 
     -- remove trailing whitespace automatically
-    use({
-        'lewis6991/spaceless.nvim',
-        config = function()
-            require('spaceless').setup()
-        end,
-    })
+    use({ 'lewis6991/spaceless.nvim' })
 
     use({
         'windwp/nvim-autopairs',
@@ -198,7 +193,7 @@ packer.startup(function()
     use({
         'nvim-telescope/telescope.nvim',
         tag = '0.1.0',
-        requires = { { 'nvim-lua/plenary.nvim' } },
+        requires = { 'nvim-lua/plenary.nvim' },
         config = function()
             local builtin = require('telescope.builtin')
             vim.keymap.set('n', '<Leader>f', builtin.find_files, { desc = 'Find files in current directory tree' })
@@ -212,8 +207,21 @@ packer.startup(function()
     })
 
     use({
-        'neovim/nvim-lspconfig',
+        'williamboman/mason.nvim',
+        requires = {
+            'williamboman/mason-lspconfig.nvim',
+            'neovim/nvim-lspconfig',
+        },
         config = function()
+            require('mason').setup({
+                PATH = 'append', -- IMPORTANT: prefer NixOS binaries is present
+            })
+            require('mason-lspconfig').setup({
+                ensure_installed = { 'lua_ls', 'rust_analyzer' },
+                automatic_installation = true,
+            })
+
+            -- lspconfig
             local opts = { noremap = true, silent = true }
             vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
             vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
@@ -281,6 +289,36 @@ packer.startup(function()
     })
 
     use({
+        'rcarriga/nvim-dap-ui',
+        requires = { 'mfussenegger/nvim-dap' },
+        config = function()
+            -- NOTE: use ':lua require("dap").set_exception_breakpoints()' to
+            -- enable exception breakpoints during a session
+            local dap = require('dap')
+
+            -- PHP
+            dap.adapters.php = {
+                type = 'executable',
+                command = 'node',
+                args = { '/home/cjb/dev/repos/vscode-php-debug/out/phpDebug.js' },
+            }
+            dap.configurations.php = {
+                {
+                    type = 'php',
+                    request = 'launch',
+                    name = 'Listen for Xdebug',
+                    host = 'localhost',
+                    port = 9003,
+                    serverSourceRoot = '/var/www/html',
+                    localSourceRoot = '${workspaceFolder}',
+                },
+            }
+
+            require('dapui').setup()
+        end,
+    })
+
+    use({
         'hrsh7th/nvim-cmp',
         requires = {
             'hrsh7th/cmp-nvim-lsp',
@@ -329,7 +367,7 @@ packer.startup(function()
         config = function()
             vim.o.updatetime = 50
             require('nvim-treesitter.configs').setup({
-                ensure_installed = 'lua',
+                ensure_installed = { 'lua', 'php', 'nix' },
                 auto_install = true,
                 highlight = { enable = true, additional_vim_regex_highlighting = false },
                 refactor = {
