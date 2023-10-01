@@ -71,6 +71,8 @@ in
     # tools
     any-nix-shell
     bubblewrap
+    jq
+    lm_sensors
     neovim
     playerctl
     podman-compose

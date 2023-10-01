@@ -28,6 +28,30 @@ Config
           ]
           "audioStatus"
           10
+      , Run
+          Com
+          "sh"
+          [ "-c"
+          , "nvidia-smi -d POWER -q | grep -e 'Power Draw' | cut -d' ' -f35 | head -n1"
+          ]
+          "gpuPowerDraw"
+          50
+      , Run
+          Com
+          "sh"
+          [ "-c"
+          , "nvidia-settings -q gpucoretemp -t"
+          ]
+          "gpuTemp"
+          50
+      , Run
+          Com
+          "sh"
+          [ "-c"
+          , "sensors -j | jq '.[\"coretemp-isa-0000\"][\"Package id 0\"][\"temp1_input\"]'"
+          ]
+          "cpuTemp"
+          50
       , Run Memory ["-t", "<used>M/<total>M (<usedratio>%)"] 10
       , Run Com "head" ["-c4", "/proc/loadavg"] "loadavg" 10
       , Run Date "%0e %^a %H:%M" "date" 10
@@ -36,5 +60,5 @@ Config
   , sepChar = "%"
   , alignSep = "}{"
   , template =
-      " %StdinReader% }{ <fc=#ff8059>%audioStatus%</fc>%volume% <fc=#a8a8a8><</fc> <fc=#b0d6f5>%memory%</fc> <fc=#a8a8a8><</fc> <fc=#6ae4b9>%arp%</fc> <fc=#a8a8a8><</fc> %loadavg% <fc=#a8a8a8><</fc> <fc=#f8dec0>%date%</fc> "
+      " %StdinReader% }{ <fc=#ff8059>%audioStatus%</fc>%volume% <fc=#a8a8a8><</fc> <fc=#b0d6f5>%memory%</fc> <fc=#a8a8a8><</fc> <fc=#6ae4b9>%arp%</fc> <fc=#a8a8a8><</fc> <fc=#b6a0ff>CPU: %cpuTemp%°C GPU: %gpuTemp%°C (%gpuPowerDraw%W)</fc> <fc=#a8a8a8><</fc> %loadavg% <fc=#a8a8a8><</fc> <fc=#f8dec0>%date%</fc> "
   }

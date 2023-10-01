@@ -79,7 +79,7 @@ main = do
     , ("M-<XF86AudioNext>", spawn "emacsclient -e '(emms-next)'")
     , ("M-<XF86AudioPlay>", spawn "emacsclient -e '(emms-play/pause-handler)'")
     , ("M-<XF86AudioPrev>", spawn "emacsclient -e '(emms-previous)'")
-    , ( "<Print>"
+    , ( "<F12>"
       , spawn "scrot -s -f ~/pictures/screenshots/%Y-%m-%d-%H%M%S-screenshot.png")
     , ( "M-p"
       , spawn
