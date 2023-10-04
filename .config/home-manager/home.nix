@@ -31,10 +31,16 @@ in
 
   home.stateVersion = "23.05";
 
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-    "discord"
-    "intelephense"
-  ];
+  nixpkgs.config = {
+    chromium = { enableWideVine = true; };
+    allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+      "chrome-widevine-cdm"
+      "chromium-unwrapped"
+      "discord"
+      "intelephense"
+      "ungoogled-chromium"
+    ];
+  };
 
   home.packages = with pkgs; [
     # libs
