@@ -176,10 +176,10 @@ in
   xresources = {
     path = "${config.xdg.configHome}/sx/xresources";
     properties = {
-      "Xcursor.size" = 24;
+      "Xcursor.size" = 32;
       "Xcursor.theme" = "Yaru";
 
-      "Xft.dpi" = 96;
+      "Xft.dpi" = 108;
       "Xft.autohint" = 0;
       "Xft.lcdfilter" = "lcddefault";
       "Xft.hintstyle" = "hintslight";
@@ -381,6 +381,10 @@ in
     EDITOR = "nvim";
     SUDO_EDITOR = "nvim";
     VISUAL = "nvim";
+
+    PAGER = "cat"; # NOTE: setting no pager breaks bad software
+    MANPAGER = "nvim +Man!";
+    MANWIDTH = 72;
 
     EMAIL = "cjbdev@icloud.com";
     NAME = "Christopher Bayliss";

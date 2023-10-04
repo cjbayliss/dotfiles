@@ -54,7 +54,7 @@ main = do
               xmobarPP
                 { ppOutput = hPutStrLn xmproc
                 , ppLayout = const ""
-                , ppTitle = xmobarColor "#b0d6f5" "" . shorten 80
+                , ppTitle = xmobarColor "#b0d6f5" "" . shorten 100
                 , ppCurrent = xmobarColor "#b6a0ff" "" . wrap "[" "]"
                 }
         } `additionalKeysP`

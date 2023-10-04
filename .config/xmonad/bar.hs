@@ -1,9 +1,10 @@
 Config
   { font =
       "Iosevka, IPAGothic Regular 11.5, Baekmuk Gulim Regular 11.5, Noto Color Emoji Regular 10, Regular 11.5"
+  , dpi = 108
   , bgColor = "#000000"
   , fgColor = "#ffffff"
-  , position = TopW L 100
+  , position = TopH 24
   , commands =
       [ Run
           ComX
@@ -17,14 +18,14 @@ Config
       , Run
           Com
           "sh"
-          ["-c", "pactl list sinks | awk '/^[[:space:]]Volume:/ {print $5}'"]
+          ["-c", "pactl list sinks | awk '/^[[:space:]]Volume:/ {print $5}' | awk 'FNR == 2 {print}'"]
           "volume"
           10
       , Run
           Com
           "sh"
           [ "-c"
-          , "pactl list sinks | awk '/Mute:/ {print $2}' | sed -e 's/yes/AUDIO OFF /' -e 's/no//'"
+          , "pactl list sinks | awk '/Mute:/ {print $2}' | awk 'FNR == 2 {print}' | sed -e 's/yes/AUDIO OFF /' -e 's/no//'"
           ]
           "audioStatus"
           10
