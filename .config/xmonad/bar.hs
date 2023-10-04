@@ -18,14 +18,14 @@ Config
       , Run
           Com
           "sh"
-          ["-c", "pactl list sinks | awk '/^[[:space:]]Volume:/ {print $5}' | awk 'FNR == 2 {print}'"]
+          ["-c", "pactl get-sink-volume @DEFAULT_SINK@ | awk '/Volume:/ {print $5}'"]
           "volume"
           10
       , Run
           Com
           "sh"
           [ "-c"
-          , "pactl list sinks | awk '/Mute:/ {print $2}' | awk 'FNR == 2 {print}' | sed -e 's/yes/AUDIO OFF /' -e 's/no//'"
+          , "pactl get-sink-mute @DEFAULT_SINK@ | sed -e 's/Mute: yes/AUDIO OFF /' -e 's/Mute: no//'"
           ]
           "audioStatus"
           10
@@ -49,7 +49,7 @@ Config
           Com
           "sh"
           [ "-c"
-          , "sensors -j | jq '.[\"coretemp-isa-0000\"][\"Package id 0\"][\"temp1_input\"]'"
+          , "sensors -j | jq '.[\"coretemp-isa-0000\"][\"Package id 0\"][\"temp1_input\"]' | cut -d'.' -f1"
           ]
           "cpuTemp"
           50
