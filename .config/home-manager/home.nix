@@ -87,14 +87,10 @@ in
 
     # gui
     (ungoogled-chromium.override { commandLineArgs = ''--js-flags="--jitless --noexpose_wasm" --no-pings ''; })
-    bottles
     discord
     firefox
-    heroic
     j4-dmenu-desktop
 
-    # games
-    openmw
   ];
 
   home.file = {
