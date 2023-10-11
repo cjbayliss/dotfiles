@@ -34,6 +34,8 @@ in
   nixpkgs.config = {
     chromium = { enableWideVine = true; };
     allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+      "VCV-Rack"
+      "bitwig-studio"
       "chrome-widevine-cdm"
       "chromium-unwrapped"
       "discord"
@@ -91,6 +93,9 @@ in
     firefox
     j4-dmenu-desktop
 
+    # music
+    bitwig-studio4
+    vcv-rack
   ];
 
   home.file = {
