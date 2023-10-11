@@ -71,16 +71,19 @@ main = do
     , ( "<XF86AudioLowerVolume>"
       , spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
     , ("<XF86AudioMute>", spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
+    , ("C-S-=", spawn "pactl set-sink-volume @DEFAULT_SINK@ +2%")
+    , ("C-S--", spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
+    , ("C-S-m", spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
       -- control multimedia
     , ("<XF86AudioNext>", spawn "playerctl next")
     , ("<XF86AudioPlay>", spawn "playerctl play-pause")
     , ("<XF86AudioPrev>", spawn "playerctl previous")
-      -- emms
-    , ("M-<XF86AudioNext>", spawn "emacsclient -e '(emms-next)'")
-    , ("M-<XF86AudioPlay>", spawn "emacsclient -e '(emms-play/pause-handler)'")
-    , ("M-<XF86AudioPrev>", spawn "emacsclient -e '(emms-previous)'")
+    , ("C-8", spawn "playerctl next")
+    , ("C-9", spawn "playerctl play-pause")
+    , ("C-0", spawn "playerctl previous")
     , ( "<F12>"
-      , spawn "scrot -s -f ~/pictures/screenshots/%Y-%m-%d-%H%M%S-screenshot.png")
+      , spawn
+          "scrot -s -f ~/pictures/screenshots/%Y-%m-%d-%H%M%S-screenshot.png")
     , ( "M-p"
       , spawn
           "j4-dmenu-desktop --dmenu=\"dmenu -i -fn 'Iosevka-11.5:semibold' -nb '#000' -nf '#fff' -sb '#000' -sf '#b6a0ff'\" --term=\"xterm\"")
