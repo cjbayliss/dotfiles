@@ -87,6 +87,10 @@ in
     scrot
     tmux
 
+    # replacements written in rust
+    procs # ps
+    uutils-coreutils-noprefix # coreutils
+
     # gui
     (ungoogled-chromium.override { commandLineArgs = ''--js-flags="--jitless --noexpose_wasm" --no-pings ''; })
     discord
@@ -199,6 +203,13 @@ in
     enable = true;
     userEmail = "cjbdev@icloud.com";
     userName = "Christopher Bayliss";
+
+    delta = {
+      enable = true;
+      options = {
+        diff-highlight = true;
+      };
+    };
   };
 
   programs.mpv = {
@@ -300,6 +311,9 @@ in
         modified = "M";
         renamed = "R";
         staged = "M";
+        ahead = "A";
+        behind = "B";
+        diverged = "#";
       };
 
       hostname = {
@@ -358,6 +372,8 @@ in
       set -U fish_pager_color_description   yellow
       set -U fish_pager_color_prefix        'white' '--bold' '--underline'
       set -U fish_pager_color_progress      '-r' 'white'
+
+      alias ps "echo \"don't you mean procs(1)?\""
     '';
 
     loginShellInit = ''
