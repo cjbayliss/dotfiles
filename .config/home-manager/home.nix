@@ -81,7 +81,6 @@ in
     bubblewrap
     jq
     lm_sensors
-    neovim
     playerctl
     podman-compose
     scrot
@@ -196,6 +195,94 @@ in
       "Xft.hintstyle" = "hintslight";
       "Xft.hinting" = 1;
       "Xft.antialias" = 1;
+    };
+  };
+
+  programs.helix = {
+    enable = true;
+    defaultEditor = true;
+    settings = {
+      theme = "cjb";
+      editor = {
+        cursorline = true;
+        cursor-shape = {
+          insert = "bar";
+          normal = "underline";
+        };
+      };
+      keys.normal = {
+        "}" = "goto_next_paragraph";
+        "{" = "goto_prev_paragraph";
+      };
+    };
+
+    themes = {
+      cjb =
+        let
+          special-blue = "#afd7ff";
+          dark-gray = "#111111";
+          medium-gray = "#222222";
+        in
+        {
+          "attribute" = "light-magenta";
+          "comment" = { fg = "light-cyan"; modifiers = [ "italic" ]; };
+          "constant" = { fg = special-blue; modifiers = [ "bold" ]; };
+          "constant.builtin" = { fg = "magenta"; modifiers = [ "italic" ]; };
+          "constant.character.escape" = "light-cyan";
+          "constant.numeric" = special-blue;
+          "constructor" = "light-blue";
+          "diagnostic" = { modifiers = [ "underlined" ]; };
+          "function" = "light-magenta";
+          "keyword" = { fg = "light-cyan"; modifiers = [ "italic" ]; };
+          "keyword.control" = "red";
+          "keyword.control.return" = { fg = "light-cyan"; modifiers = [ "italic" ]; };
+          "keyword.function" = { fg = special-blue; modifiers = [ "italic" ]; };
+          "label" = "light-magenta";
+          "markup.bold" = { fg = "light-yellow"; modifiers = [ "bold" ]; };
+          "markup.heading" = "light-blue";
+          "markup.italic" = { fg = "light-magenta"; modifiers = [ "italic" ]; };
+          "markup.link.text" = "light-red";
+          "markup.link.url" = { fg = "yellow"; modifiers = [ "underlined" ]; };
+          "markup.list" = "light-red";
+          "markup.quote" = "light-cyan";
+          "markup.raw" = "light-green";
+          "markup.strikethrough" = { modifiers = [ "crossed_out" ]; };
+          "namespace" = "light-magenta";
+          "operator" = "red";
+          "special" = "light-blue";
+          "string" = "light-blue";
+          "type" = { fg = "light-cyan"; modifiers = [ "bold" ]; };
+          "variable" = "white";
+          "variable.builtin" = { fg = "light-cyan"; modifiers = [ "italic" ]; };
+
+          "debug" = { fg = "gray"; modifiers = [ "bold" ]; };
+          "error" = { fg = "light-red"; modifiers = [ "bold" ]; };
+          "hint" = { fg = "gray"; modifiers = [ "bold" ]; };
+          "info" = { fg = "blue"; modifiers = [ "bold" ]; };
+          "warning" = { fg = "yellow"; modifiers = [ "bold" ]; };
+
+          "diff.delta" = "yellow";
+          "diff.minus" = "light-red";
+          "diff.plus" = "green";
+
+          "ui.cursor" = { fg = "light-gray"; modifiers = [ "reversed" ]; };
+          "ui.cursor.match" = { fg = "light-yellow"; modifiers = [ "underlined" ]; };
+          "ui.cursor.primary" = { fg = "light-gray"; modifiers = [ "reversed" ]; };
+          "ui.cursorline" = { bg = dark-gray; };
+          "ui.gutter" = { bg = "black"; };
+          "ui.gutter.selected" = { bg = dark-gray; };
+          "ui.help" = { fg = "white"; bg = "black"; };
+          "ui.linenr" = { fg = "light-gray"; bg = "black"; };
+          "ui.linenr.selected" = { fg = "white"; bg = dark-gray; modifiers = [ "bold" ]; };
+          "ui.menu" = { fg = "light-gray"; bg = dark-gray; };
+          "ui.menu.selected" = { fg = "light-blue"; modifiers = [ "reversed" ]; };
+          "ui.popup" = { bg = dark-gray; };
+          "ui.selection" = { bg = medium-gray; };
+          "ui.statusline" = { fg = "light-gray"; bg = dark-gray; };
+          "ui.statusline.inactive" = { fg = "gray"; bg = "black"; };
+          "ui.virtual.whitespace" = "light-gray";
+          "ui.window" = { bg = "black"; };
+        };
     };
   };
 
@@ -345,7 +432,7 @@ in
       # allow urls with '?' in them
       set -U fish_features qmark-noglob
 
-      # colors
+      # colours
       set -U fish_color_autosuggestion      brblue
       set -U fish_color_cancel              -r
       set -U fish_color_command             'white' '--bold'
@@ -374,6 +461,17 @@ in
       set -U fish_pager_color_progress      '-r' 'white'
 
       alias ps "echo \"don't you mean procs(1)?\""
+
+      # man colours
+      export LESS_TERMCAP_mb="$(tput bold; tput setaf 1)"
+      export LESS_TERMCAP_md="$(tput bold; tput setaf 1)"
+      export LESS_TERMCAP_me="$(tput sgr0)"
+      export LESS_TERMCAP_so="$(tput bold; tput setaf 12)"
+      export LESS_TERMCAP_se="$(tput sgr0)"
+      export LESS_TERMCAP_us="$(tput bold; tput setaf 14)"
+      export LESS_TERMCAP_ue="$(tput sgr0)"
+      # required for man colours to work
+      export GROFF_NO_SGR=1;
     '';
 
     loginShellInit = ''
@@ -401,12 +499,12 @@ in
     MOZ_GTK_TITLEBAR_DECORATION = "system"; # proper theming
     MOZ_USE_XINPUT2 = "1";
 
-    EDITOR = "nvim";
-    SUDO_EDITOR = "nvim";
-    VISUAL = "nvim";
+    EDITOR = "hx";
+    SUDO_EDITOR = "hx";
+    VISUAL = "hx";
 
     PAGER = "cat"; # NOTE: setting no pager breaks bad software
-    MANPAGER = "nvim +Man!";
+    MANPAGER = "less";
     MANWIDTH = 72;
 
     EMAIL = "cjbdev@icloud.com";
