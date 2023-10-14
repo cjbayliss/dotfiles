@@ -12,6 +12,5 @@
 !.config/home-manager/home.nix
 !.config/picom/picom.conf
 !.config/stylua/stylua.toml
-!.config/tmux/tmux.conf
 !.config/xmonad/bar.hs
 !.config/xmonad/xmonad.hs
