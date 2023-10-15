@@ -48,12 +48,9 @@ in
     # libs
     aspell
     aspellDicts.en
-    dmenu
-    hsetroot
     mangohud
     pulseaudio # for pactl
-    sx
-    xmobar
+    tofi
 
     # langs
     chicken
@@ -77,13 +74,11 @@ in
     stylua
 
     # tools
-    any-nix-shell
     bubblewrap
     jq
     lm_sensors
     playerctl
     podman-compose
-    scrot
     nu_scripts
 
     # replacements written in rust
@@ -130,28 +125,175 @@ in
           pass
     '';
 
-    # xorg config
-    ".config/sx/sxrc".text = ''
-      #!/bin/sh
-      source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
-      xrdb -load "$XDG_CONFIG_HOME/sx/xresources"
-
-      # systemctl --user restart redshift
-      systemctl --user restart picom
-
-      if test -z "$DBUS_SESSION_BUS_ADDRESS"; then
-          eval $(dbus-launch --exit-with-session --sh-syntax)
-      fi
-
-      systemctl --user import-environment DISPLAY XAUTHORITY
-
-      if command -v dbus-update-activation-environment >/dev/null 2>&1; then
-          dbus-update-activation-environment DISPLAY XAUTHORITY
-      fi
-
-      xmonad
+    ".config/tofi/config".text = ''
+            anchor = top
+            width = 100%
+            height = 22
+            horizontal = true
+            font-size = 12
+            prompt-text = "> "
+            text-cursor = true
+            text-cursor-style = bar
+            text-cursor-color = #ffffff
+            font = monospace
+            outline-width = 0
+            border-width = 0
+            background-color = #000000
+            selection-color = #000000
+      	    selection-background = #b6a0ff
+            min-input-width = 120
+            result-spacing = 15
+            padding-top = 0
+            padding-bottom = 0
+            padding-left = 0
+            padding-right = 0
     '';
-    ".config/sx/sxrc".executable = true;
+  };
+
+  wayland.windowManager.hyprland = {
+    enable = true;
+    enableNvidiaPatches = true;
+    settings = {
+      env = [ "XCURSOR_SIZE,32" "WLR_NO_HARDWARE_CURSORS,1" ];
+
+      exec-once = [
+        "waybar"
+        "hyprctl setcursor Yaru 32"
+      ];
+
+      general = {
+        border_size = 2;
+        gaps_in = 2;
+        gaps_out = 2;
+
+        "col.active_border" = "0xffb6a0ff";
+        "col.inactive_border" = "0xff444444";
+      };
+
+      animations = {
+        enabled = false;
+      };
+
+      decoration = {
+        rounding = 4;
+        drop_shadow = false;
+
+        blur = {
+          enabled = false;
+        };
+      };
+
+      misc = {
+        disable_hyprland_logo = true;
+        disable_splash_rendering = true;
+      };
+
+      # See https://wiki.hyprland.org/Configuring/Keywords/ for more
+      "$mod" = "SUPER";
+
+      # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
+      bind = [
+        "$mod, p, exec, j4-dmenu-desktop --dmenu='tofi' --no-generic"
+        "$mod SHIFT, Return, exec, alacritty"
+        "$mod SHIFT, c, killactive"
+        "$mod SHIFT, q, exit"
+
+        # Move focus with mod + arrow keys
+        "$mod, left, movefocus, l"
+        "$mod, right, movefocus, r"
+        "$mod, up, movefocus, u"
+        "$mod, down, movefocus, d"
+
+        # Switch workspaces with mod + [0-9]
+        "$mod, 1, workspace, 1"
+        "$mod, 2, workspace, 2"
+        "$mod, 3, workspace, 3"
+        "$mod, 4, workspace, 4"
+        "$mod, 5, workspace, 5"
+        "$mod, 6, workspace, 6"
+        "$mod, 7, workspace, 7"
+        "$mod, 8, workspace, 8"
+        "$mod, 9, workspace, 9"
+        "$mod, 0, workspace, 10"
+
+        # Move active window to a workspace with mod + SHIFT + [0-9]
+        "$mod SHIFT, 1, movetoworkspace, 1"
+        "$mod SHIFT, 2, movetoworkspace, 2"
+        "$mod SHIFT, 3, movetoworkspace, 3"
+        "$mod SHIFT, 4, movetoworkspace, 4"
+        "$mod SHIFT, 5, movetoworkspace, 5"
+        "$mod SHIFT, 6, movetoworkspace, 6"
+        "$mod SHIFT, 7, movetoworkspace, 7"
+        "$mod SHIFT, 8, movetoworkspace, 8"
+        "$mod SHIFT, 9, movetoworkspace, 9"
+        "$mod SHIFT, 0, movetoworkspace, 10"
+
+        # Scroll through existing workspaces with mod + scroll
+        "$mod, mouse_down, workspace, e+1"
+        "$mod, mouse_up, workspace, e-1"
+      ];
+
+      # Move/resize windows with mod + LMB/RMB and dragging
+      bindm = [
+        "$mod, mouse:272, movewindow"
+        "$mod, mouse:273, resizewindow"
+      ];
+    };
+  };
+
+  programs.waybar = {
+    enable = true;
+    settings = {
+      mainBar = {
+        layer = "top";
+        position = "top";
+        height = 22;
+        modules-left = [ "hyprland/workspaces" "custom/colon" "hyprland/window" ];
+        modules-center = [ ];
+        modules-right = [ "custom/mymodule#with-css-id" "temperature" ];
+
+        # "hyprland/workspaces" = {
+        #   format = "[{id}]";
+        # };
+        # "hyprland/window" = {
+        #   format = " : {title}";
+        # };
+        #   disable-scroll = true;
+        #   all-outputs = true;
+        # };
+        "custom/colon" = {
+          format = " : ";
+          max-length = 4;
+          interval = "once";
+          # exec = pkgs.writeShellScript "hello-from-waybar" ''
+          #   echo "from within waybar"
+          # '';
+        };
+      };
+  };
+
+    style = ''
+      * {
+        border: none;
+        border-radius: 0;
+        font-family: monospace;
+        font-size: 16px;
+        padding: 0;
+        margin-bottom: -0.01;
+        background: none;
+      }
+      window#waybar {
+        background: #000000;
+        color: #ffffff;
+      }
+      #workspaces button.active {
+        background: #b6a0ff;
+        color: #000000;
+      }
+      #window {
+        color: #b0d6f5;
+      }
+    '';
   };
 
   gtk = {
@@ -160,12 +302,13 @@ in
     cursorTheme = {
       name = "Yaru";
       package = pkgs.yaru-theme;
+      size = 32;
     };
 
     font = {
       name = "Inter";
       package = pkgs.inter;
-      size = 11;
+      size = 12;
     };
 
     iconTheme = {
@@ -181,21 +324,6 @@ in
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = true;
       gtk-decoration-layout = "menu:";
-    };
-  };
-
-  xresources = {
-    path = "${config.xdg.configHome}/sx/xresources";
-    properties = {
-      "Xcursor.size" = 32;
-      "Xcursor.theme" = "Yaru";
-
-      "Xft.dpi" = 108;
-      "Xft.autohint" = 0;
-      "Xft.lcdfilter" = "lcddefault";
-      "Xft.hintstyle" = "hintslight";
-      "Xft.hinting" = 1;
-      "Xft.antialias" = 1;
     };
   };
 
@@ -323,7 +451,7 @@ in
     enable = true;
     settings = {
       font = {
-        size = 11.5;
+        size = 12.5;
       };
 
       cursor = {
@@ -513,7 +641,7 @@ in
     };
 
     loginFile.text = ''
-      if ($env.DISPLAY? | is-empty) and ($env.XDG_VTNR == "1") { exec sx }
+      if ($env.DISPLAY? | is-empty) and ($env.XDG_VTNR == "1") { exec Hyprland}
     '';
   };
 
