@@ -48,12 +48,11 @@ in
     # libs
     aspell
     aspellDicts.en
-    dmenu
-    hsetroot
     mangohud
     pulseaudio # for pactl
-    sx
-    xmobar
+    qtile
+    tofi
+    yambar
 
     # langs
     chicken
@@ -62,13 +61,11 @@ in
     ghc
     nodejs_20
     php
-    python
     sbcl
 
     # langs-extras
     black
     fnlfmt
-    hlint
     lua-language-server
     nixpkgs-fmt
     nodePackages.intelephense
@@ -77,13 +74,11 @@ in
     stylua
 
     # tools
-    any-nix-shell
     bubblewrap
     jq
     lm_sensors
     playerctl
     podman-compose
-    scrot
     nu_scripts
 
     # replacements written in rust
@@ -130,28 +125,48 @@ in
           pass
     '';
 
-    # xorg config
-    ".config/sx/sxrc".text = ''
+    # wayland
+    ".local/bin/sw".text = ''
       #!/bin/sh
       source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
-      xrdb -load "$XDG_CONFIG_HOME/sx/xresources"
-
-      # systemctl --user restart redshift
-      systemctl --user restart picom
 
       if test -z "$DBUS_SESSION_BUS_ADDRESS"; then
           eval $(dbus-launch --exit-with-session --sh-syntax)
       fi
 
-      systemctl --user import-environment DISPLAY XAUTHORITY
+      export NIXOS_OZONE_WL=1
+      export WLR_NO_HARDWARE_CURSORS=1
 
-      if command -v dbus-update-activation-environment >/dev/null 2>&1; then
-          dbus-update-activation-environment DISPLAY XAUTHORITY
-      fi
-
-      xmonad
+      qtile start -b wayland
     '';
-    ".config/sx/sxrc".executable = true;
+    ".local/bin/sw".executable = true;
+
+    # dmenu replacement for wayland
+    ".config/tofi/config".text = ''
+            anchor = top
+            width = 100%
+            height = 26
+            horizontal = true
+            font-size = 12
+            prompt-text = "> "
+            text-cursor = true
+            text-cursor-style = bar
+            text-cursor-color = #ffffff
+            font = monospace
+            outline-width = 0
+            border-width = 0
+            background-color = #000000
+            selection-color = #000000
+            selection-background = #b6a0ff
+            selection-background-corner-radius=2
+            selection-background-padding=0,4
+            min-input-width = 120
+            result-spacing = 15
+            padding-top = 2
+            padding-bottom = 2
+            padding-left = 0
+            padding-right = 0
+    '';
   };
 
   gtk = {
@@ -160,12 +175,13 @@ in
     cursorTheme = {
       name = "Yaru";
       package = pkgs.yaru-theme;
+      size = 32;
     };
 
     font = {
       name = "Inter";
       package = pkgs.inter;
-      size = 11;
+      size = 12;
     };
 
     iconTheme = {
@@ -181,21 +197,6 @@ in
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = true;
       gtk-decoration-layout = "menu:";
-    };
-  };
-
-  xresources = {
-    path = "${config.xdg.configHome}/sx/xresources";
-    properties = {
-      "Xcursor.size" = 32;
-      "Xcursor.theme" = "Yaru";
-
-      "Xft.dpi" = 108;
-      "Xft.autohint" = 0;
-      "Xft.lcdfilter" = "lcddefault";
-      "Xft.hintstyle" = "hintslight";
-      "Xft.hinting" = 1;
-      "Xft.antialias" = 1;
     };
   };
 
@@ -323,7 +324,7 @@ in
     enable = true;
     settings = {
       font = {
-        size = 11.5;
+        size = 12.5;
       };
 
       cursor = {
@@ -513,7 +514,7 @@ in
     };
 
     loginFile.text = ''
-      if ($env.DISPLAY? | is-empty) and ($env.XDG_VTNR == "1") { exec sx }
+      if ($env.DISPLAY? | is-empty) and ($env.XDG_VTNR == "1") { sleep 1sec; exec ~/.local/bin/sw }
     '';
   };
 
