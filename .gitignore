@@ -10,5 +10,4 @@
 
 # and some files
 !.config/home-manager/home.nix
-!.config/stylua/stylua.toml
 !.config/qtile/config.py
