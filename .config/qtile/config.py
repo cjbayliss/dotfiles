@@ -105,8 +105,8 @@ floating_layout = layout.Floating(
 )
 
 layouts = [
-    layout.Columns(**borders, margin=2),
     layout.Max(**borders, margin=2),
+    layout.Columns(**borders, margin=2),
 ]
 
 widget_defaults = dict(
