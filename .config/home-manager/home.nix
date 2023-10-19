@@ -77,9 +77,10 @@ in
     bubblewrap
     jq
     lm_sensors
+    nixpkgs-review
+    nu_scripts
     playerctl
     podman-compose
-    nu_scripts
 
     # replacements written in rust
     procs # ps
@@ -143,29 +144,29 @@ in
 
     # dmenu replacement for wayland
     ".config/tofi/config".text = ''
-            anchor = top
-            width = 100%
-            height = 26
-            horizontal = true
-            font-size = 12
-            prompt-text = "> "
-            text-cursor = true
-            text-cursor-style = bar
-            text-cursor-color = #ffffff
-            font = monospace
-            outline-width = 0
-            border-width = 0
-            background-color = #000000
-            selection-color = #000000
-            selection-background = #b6a0ff
-            selection-background-corner-radius=2
-            selection-background-padding=0,4
-            min-input-width = 120
-            result-spacing = 15
-            padding-top = 2
-            padding-bottom = 2
-            padding-left = 0
-            padding-right = 0
+      anchor = top
+      width = 100%
+      height = 26
+      horizontal = true
+      font-size = 12
+      prompt-text = "> "
+      text-cursor = true
+      text-cursor-style = bar
+      text-cursor-color = #ffffff
+      font = monospace
+      outline-width = 0
+      border-width = 0
+      background-color = #000000
+      selection-color = #000000
+      selection-background = #b6a0ff
+      selection-background-corner-radius=2
+      selection-background-padding=0,4
+      min-input-width = 120
+      result-spacing = 15
+      padding-top = 2
+      padding-bottom = 2
+      padding-left = 0
+      padding-right = 0
     '';
   };
 
@@ -505,10 +506,23 @@ in
         }
         use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/git/git-completions.nu *
         use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/nix/nix-completions.nu *
-        # use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/man/man-completions.nu *
 
         def colours [] {
           nu ${pkgs.nu_scripts}/share/nu_scripts/modules/coloring/256_color_testpattern.nu
+        }
+
+        $env.config.hooks.command_not_found = {
+          |cmd_name| (
+            try {
+              let cnf_pkgs = (
+                open /nix/var/nix/profiles/per-user/root/channels/nixos/programs.sqlite |
+                query db $"select package from Programs where system = '(uname -m)-linux' and name = '($cmd_name)'"
+              )
+              if not ($cnf_pkgs | is-empty) {
+                $"\nMaybe try:\n  nix-shell -p " + ($cnf_pkgs | get package | str join "\n  nix-shell -p ")
+              }
+            }
+          )
         }
       '';
     };
