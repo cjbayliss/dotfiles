@@ -25,7 +25,7 @@ keys = [
     EzKey("M-C-l", lazy.layout.grow_right()),  # resize right
     EzKey("M-C-j", lazy.layout.grow_down()),  # resize down
     EzKey("M-C-k", lazy.layout.grow_up()),  # resize up
-    EzKey("M-S-<Return>", lazy.spawn("alacritty")),  # spawn a terminal
+    EzKey("M-S-<Return>", lazy.spawn("foot")),  # spawn a terminal
     EzKey("M-<Tab>", lazy.layout.next()),  # switch to next window
     EzKey("M-S-c", lazy.window.kill()),
     EzKey(
