@@ -1,4 +1,4 @@
-from libqtile import bar, layout, hook, widget
+from libqtile import bar, layout, hook, qtile, widget
 from libqtile.backend.wayland import InputConfig
 from libqtile.config import Click, Drag, EzKey, Group, Key, Match, Screen
 from libqtile.lazy import lazy
@@ -58,6 +58,10 @@ keys = [
     EzKey("M-}", lazy.spawn("playerctl next")),  # next track
 ]
 
+if qtile.core.name is "wayland":
+    for i in range(1, 7):
+        keys.extend([EzKey(f"C-A-<f{i}>", lazy.core.change_vt(i))])
+
 for i in [Group(str(s)) for s in range(10)]:
     keys.extend(
         [
@@ -101,7 +105,7 @@ floating_layout = layout.Floating(
         *layout.Floating.default_float_rules,
         Match(wm_class="awakened-poe-trade"),
     ],
-    **borders
+    **borders,
 )
 
 layouts = [
