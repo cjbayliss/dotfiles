@@ -53,6 +53,7 @@ in
     qtile
     tofi
     yambar
+    nix-your-shell
 
     # langs
     chicken
@@ -167,6 +168,10 @@ in
       padding-bottom = 2
       padding-left = 0
       padding-right = 0
+    '';
+
+    "${config.xdg.configHome}/nushell/nix-your-shell.nu".source = pkgs.runCommand "nix-your-shell.nu" { } ''
+      ${pkgs.nix-your-shell}/bin/nix-your-shell nu >> $out
     '';
   };
 
@@ -293,6 +298,9 @@ in
     enable = true;
     userEmail = "cjbdev@icloud.com";
     userName = "Christopher Bayliss";
+    extraConfig = {
+      init.defaultBranch = "main";
+    };
 
     delta = {
       enable = true;
@@ -491,6 +499,8 @@ in
         $env.config = {
           show_banner: false
         }
+        source ${config.xdg.configHome}/nushell/nix-your-shell.nu
+
         use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/git/git-completions.nu *
         use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/nix/nix-completions.nu *
 
