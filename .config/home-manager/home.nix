@@ -478,9 +478,6 @@ in
   programs.nushell = {
     enable = true;
     environmentVariables = {
-      # this isn't set properly under nushell
-      NIX_PATH = "/home/${config.home.username}/.nix-defexpr/channels:nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:nixos-config=/etc/nixos/configuration.nix:/nix/var/nix/profiles/per-user/root/channels";
-
       # vancy colours in man pages
       LESS_TERMCAP_mb = "(tput bold; tput setaf 1)";
       LESS_TERMCAP_md = "(tput bold; tput setaf 1)";
@@ -496,9 +493,12 @@ in
 
     configFile = {
       text = ''
-        $env.config = {
-          show_banner: false
-        }
+        $env.config.show_banner = false
+
+        # stuff that doesn't support nushell
+        $env.NIX_PATH = $"(bash -lc 'echo $NIX_PATH')"
+        $env.SSH_AUTH_SOCK = $"(bash -lc 'echo $SSH_AUTH_SOCK')"
+
         source ${config.xdg.configHome}/nushell/nix-your-shell.nu
 
         use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/git/git-completions.nu *
