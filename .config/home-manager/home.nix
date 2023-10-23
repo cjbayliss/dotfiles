@@ -179,26 +179,10 @@ in
   gtk = {
     enable = true;
 
-    cursorTheme = {
-      name = "Yaru";
-      package = pkgs.yaru-theme;
-      size = 32;
-    };
-
     font = {
       name = "Inter";
       package = pkgs.inter;
       size = 12;
-    };
-
-    iconTheme = {
-      name = "Yaru";
-      package = pkgs.yaru-theme;
-    };
-
-    theme = {
-      name = "Yaru";
-      package = pkgs.yaru-theme;
     };
 
     gtk3.extraConfig = {
