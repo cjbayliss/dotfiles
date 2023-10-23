@@ -1,12 +1,21 @@
-from libqtile import bar, layout, hook, qtile, widget
-from libqtile.backend.wayland import InputConfig
-from libqtile.config import Click, Drag, EzKey, Group, Key, Match, Screen
-from libqtile.lazy import lazy
+"""Provides qtile with my personal config choices"""
+from libqtile import bar, layout, hook, qtile, widget  # pylint: disable=E0401
+from libqtile.backend.wayland import InputConfig  # pylint: disable=E0401
+from libqtile.config import (  # pylint: disable=E0401
+    Click,
+    Drag,
+    EzKey,
+    Group,
+    Key,
+    Match,
+    Screen,
+)
+from libqtile.lazy import lazy  # pylint: disable=E0401
 
 
-# move and follow mpv to workspace 9
 @hook.subscribe.client_new
 def mpv(window):
+    """Move and follow mpv to workspace 9"""
     if ("mpv" in window.name) and ("mpv" in window.get_wm_class()):
         window.togroup("9", switch_group=True)
 
@@ -58,7 +67,7 @@ keys = [
     EzKey("M-}", lazy.spawn("playerctl next")),  # next track
 ]
 
-if qtile.core.name is "wayland":
+if qtile.core.name == "wayland":
     for i in range(1, 7):
         keys.extend([EzKey(f"C-A-<f{i}>", lazy.core.change_vt(i))])
 
@@ -94,11 +103,11 @@ mouse = [
     Click(["mod4"], "Button2", lazy.window.bring_to_front()),
 ]
 
-borders = dict(
-    border_focus="#b6a0ff",
-    border_normal="#444444",
-    border_width=2,
-)
+borders = {
+    "border_focus": "#b6a0ff",
+    "border_normal": "#444444",
+    "border_width": 2,
+}
 
 floating_layout = layout.Floating(
     float_rules=[
@@ -113,11 +122,11 @@ layouts = [
     layout.Columns(**borders, margin=2),
 ]
 
-widget_defaults = dict(
-    font="monospace",
-    fontsize=17,
-    padding=1,
-)
+widget_defaults = {
+    "font": "monospace",
+    "fontsize": 17,
+    "padding": 1,
+}
 
 myWidgets = [
     widget.GroupBox(
@@ -132,7 +141,7 @@ myWidgets = [
     widget.TextBox("> ", foreground="#a8a8a8"),
     widget.WindowName(foreground="#b0d6f5"),
     widget.GenPollCommand(
-        cmd="pactl get-sink-mute @DEFAULT_SINK@ | sed -e 's/Mute: yes/AUDIO OFF /' -e 's/Mute: no//'",
+        cmd="pactl get-sink-mute @DEFAULT_SINK@ | sed -e 's/Mute: yes/AUDIO OFF /' -e 's/Mute: no//'",  # pylint: disable=C0301
         foreground="#ff8059",
         shell=True,
         update_interval=1,
@@ -169,11 +178,13 @@ screens = [
     )
 ]
 
-auto_fullscreen = False
-bring_front_click = True
-focus_on_window_activation = "never"
-follow_mouse_focus = False
 
-wl_input_rules = {
-    "type:pointer": InputConfig(accel_profile="flat"),
-}
+auto_fullscreen = False  # pylint: disable=C0103
+bring_front_click = True  # pylint: disable=C0103
+focus_on_window_activation = "never"  # pylint: disable=C0103
+follow_mouse_focus = False  # pylint: disable=C0103
+
+if qtile.core.name == "wayland":
+    wl_input_rules = {
+        "type:pointer": InputConfig(accel_profile="flat"),
+    }
