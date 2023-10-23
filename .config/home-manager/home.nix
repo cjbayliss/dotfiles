@@ -49,11 +49,11 @@ in
     aspell
     aspellDicts.en
     mangohud
+    nix-your-shell
     pulseaudio # for pactl
     qtile
     tofi
     yambar
-    nix-your-shell
 
     # langs
     chicken
@@ -71,6 +71,7 @@ in
     nixpkgs-fmt
     nodePackages.intelephense
     proselint
+    pylint
     shellcheck
     stylua
 
