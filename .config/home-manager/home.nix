@@ -1,9 +1,5 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
-with pkgs;
-let
-  python = python3.withPackages (pp: with pp; [ flake8 notify2 pylint ]);
-in
 {
   home.username = "cjb";
   home.homeDirectory = "/home/cjb";
@@ -51,9 +47,7 @@ in
     mangohud
     nix-your-shell
     pulseaudio # for pactl
-    qtile
     tofi
-    yambar
 
     # langs
     chicken
@@ -64,20 +58,26 @@ in
     php
     sbcl
 
+    # python
+    (python3.withPackages (pythonPackages: with pythonPackages; [
+      pylint
+      python-lsp-server
+      qtile
+      black
+    ]))
+
     # langs-extras
-    black
     fnlfmt
     lua-language-server
+    nil
     nixpkgs-fmt
     nodePackages.intelephense
     proselint
-    pylint
     shellcheck
     stylua
 
     # tools
     bubblewrap
-    jq
     lm_sensors
     nixpkgs-review
     nu_scripts
@@ -209,6 +209,18 @@ in
       };
     };
 
+    languages = {
+      language = [
+        { name = "nix"; auto-format = true; formatter = { command = "${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt"; }; }
+        {
+          name = "python";
+          auto-format = true;
+          formatter = { command = "${pkgs.black}/bin/black"; args = [ "--quiet" "-" ]; };
+          config = { pylsp.plugins.pylint.enabled = true; };
+        }
+      ];
+    };
+
     themes = {
       cjb =
         let
@@ -297,7 +309,7 @@ in
 
   programs.mpv = {
     enable = true;
-    package = (pkgs.mpv.override { scripts = [ mpvScripts.mpris ]; });
+    package = (pkgs.mpv.override { scripts = [ pkgs.mpvScripts.mpris ]; });
 
     bindings = {
       "q" = "stop";
