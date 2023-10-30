@@ -210,13 +210,13 @@
     };
 
     languages = {
+      language-server.pylsp.config.pylsp.plugins.pylint.enabled = true;
       language = [
         { name = "nix"; auto-format = true; formatter = { command = "${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt"; }; }
         {
           name = "python";
           auto-format = true;
           formatter = { command = "${pkgs.black}/bin/black"; args = [ "--quiet" "-" ]; };
-          config = { pylsp.plugins.pylint.enabled = true; };
         }
       ];
     };
