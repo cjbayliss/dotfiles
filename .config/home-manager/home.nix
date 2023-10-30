@@ -505,6 +505,17 @@
           nu ${pkgs.nu_scripts}/share/nu_scripts/modules/coloring/256_color_testpattern.nu
         }
 
+        extern-wrapped jr [...rest] {
+          let package = (
+            open /nix/var/nix/profiles/per-user/root/channels/nixos/programs.sqlite |
+            query db $"select package from Programs where system = '(uname -m)-linux' and name = '($rest.0)'" |
+            get package.0
+          )
+          mut cmd = $rest;
+          for arg in $cmd { if ($arg | path exists) { $cmd = ($cmd | str replace $arg $"'($arg)'") } }
+          ^nix-shell -p $package --run $'($cmd | str join " ")'
+        }
+
         $env.config.hooks.command_not_found = {
           |cmd_name| (
             try {
