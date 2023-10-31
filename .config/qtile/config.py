@@ -63,8 +63,8 @@ keys = [
     EzKey(
         "M-<backslash>", lazy.spawn("playerctl play-pause")
     ),  # play/pause video/audio
-    EzKey("M-{", lazy.spawn("playerctl previous")),  # previous track
-    EzKey("M-}", lazy.spawn("playerctl next")),  # next track
+    EzKey("M-<bracketleft>", lazy.spawn("playerctl previous")),  # previous track
+    EzKey("M-<bracketright>", lazy.spawn("playerctl next")),  # next track
 ]
 
 if qtile.core.name == "wayland":
