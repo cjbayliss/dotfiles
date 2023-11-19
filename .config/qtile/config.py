@@ -159,7 +159,7 @@ myWidgets = [
     ),
     widget.TextBox(fmt=" &lt; ", foreground="#a8a8a8"),
     widget.GenPollCommand(
-        cmd="ip -br a | grep UP | sed 's/   //g' | cut -d ' ' -f 3 | cut -d/ -f1",
+        cmd="ip -j a | jq -r 'first(.[] | select(.operstate == \"UP\") | .addr_info[] | .local)'",
         shell=True,
         foreground="#6ae4b9",
     ),
