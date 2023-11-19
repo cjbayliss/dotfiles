@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""jr is a tool to 'Just Run' a command using nix-shell"""
+
+from os import path
+from platform import machine, system
+import sqlite3
+import subprocess
+import sys
+
+NIXOS_PLATFORM = f"{machine()}-{system().lower()}"
+NIXOS_PROGRAMS_DATABASE = (
+    "/nix/var/nix/profiles/per-user/root/channels/nixos/programs.sqlite"
+)
+
+
+def get_first_package_match(database: str, platform: str, program: str) -> str:
+    """Return the first match for the program."""
+    try:
+        return (
+            sqlite3.connect(database)
+            .cursor()
+            .execute(
+                "SELECT package FROM Programs WHERE system = (?) AND name = (?)",
+                (platform, program),
+            )
+            .fetchone()[0]
+        )
+    except TypeError:
+        print(f"{program} not found in {NIXOS_PROGRAMS_DATABASE}")
+        sys.exit(1)
+
+
+def escape_paths(command: list) -> list:
+    """Return the command with paths escaped"""
+    for i, arg in enumerate(command):
+        if path.exists(arg):
+            command[i] = f"'{arg}'"
+    return command
+
+
+try:
+    if len(sys.argv) >= 2:
+        subprocess.run(
+            [
+                "nix-shell",
+                "-p",
+                get_first_package_match(
+                    NIXOS_PROGRAMS_DATABASE,
+                    NIXOS_PLATFORM,
+                    sys.argv[1],
+                ),
+                "--run",
+                f"{sys.argv[1]} {' '.join(escape_paths(sys.argv[2:]))}",
+            ],
+            check=True,
+        )
+    else:
+        print("usage: jr program [PATH]")
+except subprocess.CalledProcessError as error:
+    print(f"Error: {error}")
