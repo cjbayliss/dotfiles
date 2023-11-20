@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """jr is a tool to 'Just Run' a command using nix-shell"""
 
+from difflib import get_close_matches
 from os import path
 from platform import machine, system
 import sqlite3
@@ -11,46 +12,49 @@ NIXOS_PLATFORM = f"{machine()}-{system().lower()}"
 NIXOS_PROGRAMS_DATABASE = (
     "/nix/var/nix/profiles/per-user/root/channels/nixos/programs.sqlite"
 )
+PROGRAM = sys.argv[1]
 
 
-def get_first_package_match(database: str, platform: str, program: str) -> str:
-    """Return the first match for the program."""
+def get_packages(database: str, platform: str, program: str) -> list:
+    """Return all package matches for the program"""
     try:
-        return (
-            sqlite3.connect(database)
+        return [
+            package[0]
+            for package in sqlite3.connect(database)
             .cursor()
             .execute(
                 "SELECT package FROM Programs WHERE system = (?) AND name = (?)",
                 (platform, program),
             )
-            .fetchone()[0]
-        )
+            .fetchall()
+        ]
     except TypeError:
         print(f"{program} not found in {NIXOS_PROGRAMS_DATABASE}")
         sys.exit(1)
 
 
-def escape_paths(command: list) -> list:
-    """Return the command with paths escaped"""
-    for i, arg in enumerate(command):
+def escape_paths(arguments: list) -> list:
+    """Return the arguments with paths escaped"""
+    for i, arg in enumerate(arguments):
         if path.exists(arg):
-            command[i] = f"'{arg}'"
-    return command
+            arguments[i] = f"'{arg}'"
+    return arguments
 
 
 try:
     if len(sys.argv) >= 2:
+        packages = get_close_matches(
+            PROGRAM,
+            get_packages(NIXOS_PROGRAMS_DATABASE, NIXOS_PLATFORM, PROGRAM),
+        )
+        escaped_arguments = f"{PROGRAM} {' '.join(escape_paths(sys.argv[2:]))}"
         subprocess.run(
             [
                 "nix-shell",
                 "-p",
-                get_first_package_match(
-                    NIXOS_PROGRAMS_DATABASE,
-                    NIXOS_PLATFORM,
-                    sys.argv[1],
-                ),
+                packages[0],
                 "--run",
-                f"{sys.argv[1]} {' '.join(escape_paths(sys.argv[2:]))}",
+                escaped_arguments,
             ],
             check=True,
         )
