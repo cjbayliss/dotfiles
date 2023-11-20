@@ -17,20 +17,20 @@ PROGRAM = sys.argv[1]
 
 def get_packages(database: str, platform: str, program: str) -> list:
     """Return all package matches for the program"""
-    try:
-        return [
-            package[0]
-            for package in sqlite3.connect(database)
-            .cursor()
-            .execute(
-                "SELECT package FROM Programs WHERE system = (?) AND name = (?)",
-                (platform, program),
-            )
-            .fetchall()
-        ]
-    except TypeError:
-        print(f"{program} not found in {NIXOS_PROGRAMS_DATABASE}")
+    pkgs = (
+        sqlite3.connect(database)
+        .cursor()
+        .execute(
+            "SELECT package FROM Programs WHERE system = (?) AND name = (?)",
+            (platform, program),
+        )
+        .fetchall()
+    )
+    if len(pkgs) == 0:
+        print(f"{program} not found in {database}")
         sys.exit(1)
+
+    return [pkg[0] for pkg in pkgs]
 
 
 def escape_paths(arguments: list) -> list:
