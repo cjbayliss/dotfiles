@@ -44,10 +44,14 @@
     # libs
     aspell
     aspellDicts.en
+    dmenu
+    hsetroot
     mangohud
     nix-your-shell
     pulseaudio # for pactl
+    sx
     tofi
+    xmobar
 
     # langs
     chicken
@@ -83,6 +87,7 @@
     nixpkgs-review
     playerctl
     podman-compose
+    scrot
 
     # replacements written in rust
     procs # ps
@@ -128,6 +133,27 @@
           pass
     '';
 
+    # xorg
+    ".config/sx/sxrc".text = ''
+      #!/bin/sh
+      source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
+      xrdb -load "$XDG_CONFIG_HOME/sx/xresources"
+
+      systemctl --user restart picom
+
+      if test -z "$DBUS_SESSION_BUS_ADDRESS"; then
+          eval $(dbus-launch --exit-with-session --sh-syntax)
+      fi
+
+      systemctl --user import-environment DISPLAY XAUTHORITY
+
+      if command -v dbus-update-activation-environment >/dev/null 2>&1; then
+          dbus-update-activation-environment DISPLAY XAUTHORITY
+      fi
+
+      xmonad
+    '';
+
     # wayland
     ".local/bin/sw".text = ''
       #!/bin/sh
@@ -171,6 +197,23 @@
       padding-left = 0
       padding-right = 0
     '';
+
+    ".config/sx/sxrc".executable = true;
+  };
+
+  xresources = {
+    path = "${config.xdg.configHome}/sx/xresources";
+    properties = {
+      "Xcursor.size" = 32;
+      "Xcursor.theme" = "Yaru";
+
+      "Xft.dpi" = 108;
+      "Xft.autohint" = 0;
+      "Xft.lcdfilter" = "lcddefault";
+      "Xft.hintstyle" = "hintslight";
+      "Xft.hinting" = 1;
+      "Xft.antialias" = 1;
+    };
   };
 
   gtk = {
@@ -320,6 +363,51 @@
       slang = "eng,en,enUS";
       cache = "auto";
       embeddedfonts = "no";
+    };
+  };
+
+  programs.alacritty = {
+    enable = true;
+    settings = {
+      font = {
+        size = 11.5;
+      };
+
+      cursor = {
+        blink_interval = 500;
+        style = {
+          blinking = "Always";
+          shape = "Underline";
+        };
+      };
+
+      # https://gitlab.com/protesilaos/dotfiles/-/raw/487affab/emacs/.emacs.d/prot-lisp/modus-themes-exporter.el
+      colors = {
+        bright = {
+          black = "#595959";
+          blue = "#79a8ff";
+          cyan = "#6ae4b9";
+          green = "#70b900";
+          magenta = "#b6a0ff";
+          red = "#ef8b50";
+          white = "#ffffff";
+          yellow = "#c0c530";
+        };
+        normal = {
+          black = "#000000";
+          blue = "#2fafff";
+          cyan = "#00d3d0";
+          green = "#44bc44";
+          magenta = "#feacd0";
+          red = "#ff8059";
+          white = "#bfbfbf";
+          yellow = "#d0bc00";
+        };
+        primary = {
+          background = "#000000";
+          foreground = "#ffffff";
+        };
+      };
     };
   };
 
@@ -523,7 +611,7 @@
 
     loginShellInit = ''
       if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]
-          exec sw
+          exec sx
       end
     '';
   };

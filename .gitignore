@@ -13,4 +13,6 @@
 # and some files
 !.config/home-manager/home.nix
 !.config/qtile/config.py
+!.config/xmonad/bar.hs
+!.config/xmonad/xmonad.hs
 !.local/bin/jr
