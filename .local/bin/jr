@@ -41,13 +41,14 @@ def escape_paths(arguments: list) -> list:
     return arguments
 
 
-try:
-    if len(sys.argv) >= 2:
-        packages = get_close_matches(
-            PROGRAM,
-            get_packages(NIXOS_PROGRAMS_DATABASE, NIXOS_PLATFORM, PROGRAM),
-        )
-        escaped_arguments = f"{PROGRAM} {' '.join(escape_paths(sys.argv[2:]))}"
+if len(sys.argv) >= 2:
+    packages = get_close_matches(
+        PROGRAM,
+        get_packages(NIXOS_PROGRAMS_DATABASE, NIXOS_PLATFORM, PROGRAM),
+        cutoff=0,
+    )
+    escaped_arguments = f"{PROGRAM} {' '.join(escape_paths(sys.argv[2:]))}"
+    try:
         subprocess.run(
             [
                 "nix-shell",
@@ -58,7 +59,7 @@ try:
             ],
             check=True,
         )
-    else:
-        print("usage: jr program [PATH]")
-except subprocess.CalledProcessError as error:
-    print(f"Error: {error}")
+    except subprocess.CalledProcessError as error:
+        print(f"Error: {error}")
+else:
+    print("usage: jr program [PATH]")
