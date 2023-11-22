@@ -10,7 +10,7 @@ Config
           ComX
           "sh"
           [ "-c"
-          , "awk 'FNR==2 { e=1; print $1 }; END { exit !e }' /proc/net/arp"
+          , "ip -j a | jq -r 'first(.[] | select(.operstate == \"UP\") | .addr_info[] | .local)'"
           ]
           "DOWN"
           "arp"
