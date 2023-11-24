@@ -38,31 +38,35 @@ def escape_paths(arguments: List[str]) -> List[str]:
     return [f"'{arg}'" if path.exists(arg) else arg for arg in arguments]
 
 
+def nix_shell(package: str, program: str, arguments: str) -> None:
+    """Run the command using nix-shell"""
+    try:
+        subprocess.run(
+            [
+                "nix-shell",
+                "-p",
+                package,
+                "--run",
+                f"{program} {arguments}",
+            ],
+            check=True,
+        )
+    except subprocess.CalledProcessError as error:
+        sys.exit(error.returncode)
+
+
 def main() -> None:  # pylint: disable=C0116
     if len(sys.argv) < 2:
         print("usage: jr program [PATH]")
         sys.exit(1)
 
     program = sys.argv[1]
-    packages = get_close_matches(
+    package = get_close_matches(
         program,
         get_packages(NIXOS_PROGRAMS_DATABASE, NIXOS_PLATFORM, program),
         cutoff=0,
-    )
-    safe_args = " ".join(escape_paths(sys.argv[2:]))
-    try:
-        subprocess.run(
-            [
-                "nix-shell",
-                "-p",
-                packages[0],
-                "--run",
-                f"{program} {safe_args}",
-            ],
-            check=True,
-        )
-    except subprocess.CalledProcessError:
-        sys.exit(1)
+    )[0]
+    nix_shell(package, program, " ".join(escape_paths(sys.argv[2:])))
 
 
 if __name__ == "__main__":
