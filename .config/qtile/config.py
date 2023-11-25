@@ -166,7 +166,13 @@ myWidgets = [
     widget.TextBox(fmt=" &lt; ", foreground="#a8a8a8"),
     widget.Load(format="{load:.2f}"),
     widget.TextBox(fmt=" &lt; ", foreground="#a8a8a8"),
-    widget.Clock(foreground="#f8dec0", format="%0e %^a %H:%M "),
+    widget.GenPollCommand(
+        cmd="wz 86077",  # 86077 is Moorabbin Airport
+        shell=True,
+        update_interval=900,
+        foreground="#f8dec0",
+    ),
+    widget.Clock(foreground="#f8dec0", format=" %0e %^a %H:%M "),
 ]
 
 screens = [
