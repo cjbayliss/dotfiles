@@ -21,12 +21,11 @@ def extract_temperature_cdata(raw_xml_content: bytes) -> str:
     """Extract temperature data from CDATA in the XML content."""
     # NOTE: the CDATA for the temperature is in the first item > description
     # element set
-    return (
-        minidom.parseString(raw_xml_content)
-        .getElementsByTagName("item")[0]
-        .getElementsByTagName("description")[0]
-        .firstChild.nodeValue
+    item = minidom.parseString(raw_xml_content).getElementsByTagName("item")[0]
+    description = (
+        item.getElementsByTagName("description")[0].childNodes[0] if item else None
     )
+    return description.nodeValue if description else ""
 
 
 def clean_temperature_cdata(raw_xml_content: bytes) -> str:
@@ -36,9 +35,10 @@ def clean_temperature_cdata(raw_xml_content: bytes) -> str:
 
 def parse_temperature(raw_xml_content: bytes) -> str:
     """Extract the temperature value in degrees Celsius from the cleaned XML content."""
-    return re.search(
+    match = re.search(
         r"Temperature:\s*([\d.]+)&#176;C", clean_temperature_cdata(raw_xml_content)
-    ).group(1)
+    )
+    return f"{match.group(1)}°C" if match else ""
 
 
 if __name__ == "__main__":

@@ -64,10 +64,11 @@
 
     # python
     (python3.withPackages (pythonPackages: with pythonPackages; [
+      black
       pylint
+      pylsp-mypy
       python-lsp-server
       qtile
-      black
     ]))
 
     # langs-extras
