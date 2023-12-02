@@ -476,10 +476,10 @@
       set -g mouse on
 
       # scratch buffer/popup
-      bind-key -n "M-'" if-shell -F "#{==:#{session_name},scratch}" {
-          detach-client
+      bind-key -n "C-j" if-shell "tmux list-clients -t scratch 2>/dev/null | grep -q ." {
+          detach-client -s scratch
       } {
-          display-popup -E -w 85% -h 85% "tmux new-session -A -s scratch \; set status off"
+          split-window -v -l 25% "TMUX= tmux new-session -A -s scratch \\; set status off"
       }
 
       # easy open command-prompt
