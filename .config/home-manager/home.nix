@@ -154,6 +154,7 @@
 
       xmonad
     '';
+    ".config/sx/sxrc".executable = true;
 
     # wayland
     ".local/bin/sw".text = ''
@@ -199,7 +200,9 @@
       padding-right = 0
     '';
 
-    ".config/sx/sxrc".executable = true;
+    "${config.xdg.configHome}/nushell/nix-your-shell.nu".source = pkgs.runCommand "nix-your-shell.nu" { } ''
+      ${pkgs.nix-your-shell}/bin/nix-your-shell nu >> $out
+    '';
   };
 
   xresources = {
@@ -500,7 +503,7 @@
 
   programs.starship = {
     enable = true;
-    enableFishIntegration = true;
+    enableNushellIntegration = true;
     settings = {
       add_newline = false;
       character = {
@@ -556,65 +559,69 @@
 
     };
   };
-  programs.fish = {
+
+  programs.nushell = {
     enable = true;
-    interactiveShellInit = ''
-      set fish_greeting
+    environmentVariables = {
+      # vancy colours in man pages
+      LESS_TERMCAP_mb = "(tput bold; tput setaf 1)";
+      LESS_TERMCAP_md = "(tput bold; tput setaf 1)";
+      LESS_TERMCAP_me = "(tput sgr0)";
+      LESS_TERMCAP_so = "(tput bold; tput setaf 12)";
+      LESS_TERMCAP_se = "(tput sgr0)";
+      LESS_TERMCAP_us = "(tput bold; tput setaf 14)";
+      LESS_TERMCAP_ue = "(tput sgr0)";
 
-      if command -q nix-your-shell
-        nix-your-shell fish | source
-      end
+      # required for colours in man pages to work
+      GROFF_NO_SGR = "1";
+    };
 
-      # allow urls with '?' in them
-      set -U fish_features qmark-noglob
+    configFile = {
+      text = ''
+        $env.config.show_banner = false
+        # stuff that doesn't support nushell
+        $env.NIX_PATH = $"(bash -lc 'echo $NIX_PATH')"
+        $env.SSH_AUTH_SOCK = $"(bash -lc 'echo $SSH_AUTH_SOCK')"
+        source ${config.xdg.configHome}/nushell/nix-your-shell.nu
+        use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/git/git-completions.nu *
+        use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/nix/nix-completions.nu *
 
-      # colours
-      set -U fish_color_autosuggestion      brblue
-      set -U fish_color_cancel              -r
-      set -U fish_color_command             'white' '--bold'
-      set -U fish_color_comment             brblue
-      set -U fish_color_cwd                 brcyan
-      set -U fish_color_cwd_root            red
-      set -U fish_color_end                 brmagenta
-      set -U fish_color_error               brred
-      set -U fish_color_escape              brcyan
-      set -U fish_color_history_current     --bold
-      set -U fish_color_host                normal
-      set -U fish_color_match               --background=brblue
-      set -U fish_color_normal              normal
-      set -U fish_color_operator            normal
-      set -U fish_color_param               normal
-      set -U fish_color_quote               yellow
-      set -U fish_color_redirection         bryellow
-      set -U fish_color_search_match        'bryellow' '--background=brblack'
-      set -U fish_color_selection           'white' '--bold' '--background=brblack'
-      set -U fish_color_status              red
-      set -U fish_color_user                green
-      set -U fish_color_valid_path          --underline
-      set -U fish_pager_color_completion    normal
-      set -U fish_pager_color_description   yellow
-      set -U fish_pager_color_prefix        'white' '--bold' '--underline'
-      set -U fish_pager_color_progress      '-r' 'white'
+        def colours [] {
+          nu ${pkgs.nu_scripts}/share/nu_scripts/modules/coloring/256_color_testpattern.nu
+        }
 
-      alias ps "echo \"don't you mean procs(1)?\""
+        def --wrapped jr [...rest] {
+          let package = (
+            open /nix/var/nix/profiles/per-user/root/channels/nixos/programs.sqlite |
+            query db $"select package from Programs where system = '(uname -m)-linux' and name = '($rest.0)'" |
+            get package.0
+          )
+          mut cmd = $rest;
+          for arg in $cmd { if ($arg | path exists) { $cmd = ($cmd | str replace $arg $"'($arg)'") } }
+          ^nix-shell -p $package --run $'($cmd | str join " ")'
+        }
 
-      # man colours
-      export LESS_TERMCAP_mb="$(tput bold; tput setaf 1)"
-      export LESS_TERMCAP_md="$(tput bold; tput setaf 1)"
-      export LESS_TERMCAP_me="$(tput sgr0)"
-      export LESS_TERMCAP_so="$(tput bold; tput setaf 12)"
-      export LESS_TERMCAP_se="$(tput sgr0)"
-      export LESS_TERMCAP_us="$(tput bold; tput setaf 14)"
-      export LESS_TERMCAP_ue="$(tput sgr0)"
-      # required for man colours to work
-      export GROFF_NO_SGR=1;
-    '';
+        $env.config.hooks.command_not_found = {
+          |cmd_name| (
+            try {
+              let cnf_pkgs = (
+                open /nix/var/nix/profiles/per-user/root/channels/nixos/programs.sqlite |
+                query db $"select package from Programs where system = '(uname -m)-linux' and name = '($cmd_name)'"
+              )
+              if not ($cnf_pkgs | is-empty) {
+                $"\nMaybe try:\n  nix-shell -p " + ($cnf_pkgs | get package | str join "\n  nix-shell -p ")
+              }
+            }
+          )
+        }
+      '';
+    };
 
-    loginShellInit = ''
-      if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]
-          exec sx
-      end
-    '';
+    loginFile = {
+      text = ''
+        if ($env.DISPLAY? | is-empty) and ($env.XDG_VTNR == "1") { exec sx }
+      '';
+    };
   };
 
   programs.yt-dlp = {
