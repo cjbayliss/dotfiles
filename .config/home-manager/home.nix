@@ -37,6 +37,7 @@
       "discord"
       "intelephense"
       "ungoogled-chromium"
+      "ungoogled-chromium-unwrapped"
     ];
   };
 
@@ -51,6 +52,7 @@
     pulseaudio # for pactl
     sx
     tofi
+    wineWowPackages.stagingFull
     xmobar
 
     # langs
@@ -100,6 +102,7 @@
     discord
     firefox
     j4-dmenu-desktop
+    lutris-free
 
     # music
     bitwig-studio4
@@ -454,7 +457,7 @@
       set -g status-position top
       set -g status-style "fg=white bg=black"
       set -g status-left ""
-      set -g status-right "#[fg=colour255,bg=colour235] %H#[fg=brightcyan]:#[fg=colour255]%M#[fg=brightcyan]:#[fg=colour255]%S "
+      set -g status-right "#[fg=colour255,bg=colour235] %H#[fg=brightcyan]:#[fg=colour255]%M "
 
       setw -g window-status-current-style "fg=brightmagenta bg=colour235"
       setw -g window-status-current-format " #I#[fg=brightmagenta]:#[fg=colour255]#W#[fg=brightcyan]#F "
