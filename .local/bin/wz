@@ -1,51 +1,5 @@
-#!/usr/bin/env python3
-"""
-Fetch RSS XML file from weatherzone, and print the temperature for the specified
-location (Number)
-"""
-from sys import exit as sys_exit, argv
-from xml.dom import minidom
-import re
-import urllib.request
+#!/usr/bin/env nu
 
-WEATHERZONE_URL = "https://rss.weatherzone.com.au/wx.php?lt=site&lc={}&obs=1"
-
-
-def fetch_weather_data(url: str) -> bytes:
-    """Fetch weather XML data from the specified URL."""
-    with urllib.request.urlopen(url) as response:
-        return response.read()
-
-
-def extract_temperature_cdata(raw_xml_content: bytes) -> str:
-    """Extract temperature data from CDATA in the XML content."""
-    # NOTE: the CDATA for the temperature is in the first item > description
-    # element set
-    item = minidom.parseString(raw_xml_content).getElementsByTagName("item")[0]
-    description = (
-        item.getElementsByTagName("description")[0].childNodes[0] if item else None
-    )
-    return description.nodeValue if description else ""
-
-
-def clean_temperature_cdata(raw_xml_content: bytes) -> str:
-    """Clean CDATA in the XML content by removing HTML tags."""
-    return re.sub(r"<.*?>", "", extract_temperature_cdata(raw_xml_content).strip())
-
-
-def parse_temperature(raw_xml_content: bytes) -> str:
-    """Extract the temperature value in degrees Celsius from the cleaned XML content."""
-    match = re.search(
-        r"Temperature:\s*([\d.]+)&#176;C", clean_temperature_cdata(raw_xml_content)
-    )
-    return f"{match.group(1)}°C" if match else ""
-
-
-if __name__ == "__main__":
-    try:
-        print(
-            parse_temperature(fetch_weather_data(WEATHERZONE_URL.format(int(argv[1]))))
-        )
-    except (ValueError, IndexError):
-        print("Usage: wz LOCATION\n\nLOCATION must be an integer\n")
-        sys_exit(1)
+def main [geohash: string] {
+  (http get https://api.weather.bom.gov.au/v1/locations/($geohash)/observations | from json).data.temp | append °C | str join
+}

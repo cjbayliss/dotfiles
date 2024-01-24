@@ -33,8 +33,8 @@ Config
           Com
           "sh"
           [ "-c"
-          , "wz 86077" -- 86077 is Moorabbin Airport
-          ]
+          , "wz r1r07e" -- r1r07e is the "geohash" for Brighton
+          ] -- See https://github.com/bremor/bureau_of_meteorology/blob/9b20d1d/api%20doc/API.md
           "temperature"
           9000
       , Run Memory ["-t", "<used>M/<total>M (<usedratio>%)"] 10
