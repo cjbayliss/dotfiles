@@ -141,14 +141,14 @@ myWidgets = [
     widget.TextBox("> ", foreground="#a8a8a8"),
     widget.WindowName(foreground="#b0d6f5"),
     widget.GenPollCommand(
-        cmd="pactl get-sink-mute @DEFAULT_SINK@ | sed -e 's/Mute: yes/AUDIO OFF /' -e 's/Mute: no//'",  # pylint: disable=C0301
+        cmd="nu -c \"if (pactl get-sink-mute @DEFAULT_SINK@ | split column -r '\\s+' | get column2 | to text) == yes { print 'AUDIO OFF' }\"",  # pylint: disable=C0301
         foreground="#ff8059",
         shell=True,
         update_interval=1,
     ),
     widget.TextBox(fmt=" "),
     widget.GenPollCommand(
-        cmd="pactl get-sink-volume @DEFAULT_SINK@ | awk '/Volume:/ {print $5}'",
+        cmd="nu -c \"pactl get-sink-volume @DEFAULT_SINK@ | split column -r '\\s+' | get column5 | to text\"",  # pylint: disable=C0301
         shell=True,
         update_interval=1,
     ),
@@ -159,7 +159,7 @@ myWidgets = [
     ),
     widget.TextBox(fmt=" &lt; ", foreground="#a8a8a8"),
     widget.GenPollCommand(
-        cmd="ip -j a | jq -r 'first(.[] | select(.operstate == \"UP\") | .addr_info[] | .local)'",
+        cmd="nu -c 'ip -j a | from json | where operstate == UP | get addr_info | first | get local | to text'",  # pylint: disable=C0301
         shell=True,
         foreground="#6ae4b9",
     ),
@@ -167,8 +167,9 @@ myWidgets = [
     widget.Load(format="{load:.2f}"),
     widget.TextBox(fmt=" &lt; ", foreground="#a8a8a8"),
     widget.GenPollCommand(
-        cmd="wz r1r07e",  # r1r07e is the "geohash" for Brighton
+        # r1r07e is the "geohash" for Brighton
         # See https://github.com/bremor/bureau_of_meteorology/blob/9b20d1d/api%20doc/API.md
+        cmd="nu -c '(http get https://api.weather.bom.gov.au/v1/locations/r1r07e/observations | from json).data.temp | append °C | str join'",  # pylint: disable=C0301
         shell=True,
         update_interval=900,
         foreground="#f8dec0",

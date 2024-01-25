@@ -85,7 +85,6 @@
 
     # tools
     bubblewrap
-    jq
     lm_sensors
     nixpkgs-review
     playerctl

@@ -1,5 +1,0 @@
-#!/usr/bin/env nu
-
-def main [geohash: string] {
-  (http get https://api.weather.bom.gov.au/v1/locations/($geohash)/observations | from json).data.temp | append °C | str join
-}
