@@ -9,7 +9,7 @@ def dmenu [] {
   }
 }
 
-# function to generate the application list and cache it as a json file
+# function to generate the application list
 def generate_app_list [] {
   $env.XDG_DATA_DIRS | split row ':' | append '~/.local/share'
   | each {||
@@ -20,31 +20,22 @@ def generate_app_list [] {
   | flatten | wrap name | where name =~ '\.desktop' | get name
   | each {||
     open $in
-    | grep -m2 -e ^Name= -e ^Exec=
+    | split row -r '\n'
+    | find -r '^Name=|^Exec='
+    | get 0 1
     | str replace 'Name=' 'name,'
     | str replace 'Exec=' 'command,'
     | str replace -r ' -- %.| %.' ''
-    | from csv | transpose | headers
+    | to text | from csv | transpose | headers
   }
-  | flatten | select name command | uniq | sort
-  | to json | save -f $'($env.XDG_CACHE_HOME)/applications.json'
+  | flatten | uniq | select name command | sort
 }
 
 def main [] {
-  # generate the application list if it doesn't exists
-  if not ($'($env.XDG_CACHE_HOME)/applications.json' | path exists) {
-    generate_app_list
-  }
-
-  let $apps = open $'($env.XDG_CACHE_HOME)/applications.json'
-
+  let $apps = generate_app_list
   let $selection = ($apps | get name | to text | dmenu | str replace -r '\n' '')
 
   if not ($selection | is-empty) {
     sh -c $'($apps | where name == $selection | get command | to text) &'
   }
-
-  # FIXME: this is an ugly solution, would be better to hook nix-build
-  # regenerate the application list after we are done
-  generate_app_list
 }
