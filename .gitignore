@@ -15,6 +15,5 @@
 !.config/qtile/config.py
 !.config/xmonad/bar.hs
 !.config/xmonad/xmonad.hs
-!.local/bin/jr
-!.local/bin/wz
+!.local/bin/dmenu-apps
 !user.js

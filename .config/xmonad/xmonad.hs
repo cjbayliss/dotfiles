@@ -24,6 +24,8 @@ myManageHook =
     , className =? "gmic_qt" --> doCenterFloat
     , className =? "gmic" --> doFloat
     , className =? "awakened-poe-trade" --> doFloat
+    , title =? "Wine System Tray" --> doShift "8"
+    , title =? "Battle.net" --> doF(W.view "4") <+> doShift "4"
     , isInProperty "_NET_WM_WINDOW_TYPE" "_NET_WM_WINDOW_TYPE_UTILITY" -->
       doFloat
     , stringProperty "WM_WINDOW_ROLE" =? "GtkFileChooserDialog" -->
@@ -81,7 +83,5 @@ main = do
     , ( "M-s"
       , spawn
           "scrot -s -f ~/pictures/screenshots/%Y-%m-%d-%H%M%S-screenshot.png")
-    , ( "M-p"
-      , spawn
-          "j4-dmenu-desktop --dmenu=\"dmenu -i -fn 'Iosevka-11.5:semibold' -nb '#000' -nf '#fff' -sb '#000' -sf '#b6a0ff'\" --term=\"xterm\"")
+    , ("M-p", spawn "dmenu-apps")
     ]
