@@ -1,6 +1,9 @@
-{ config, lib, pkgs, ... }:
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   home.username = "cjb";
   home.homeDirectory = "/home/cjb";
   xdg = {
@@ -28,15 +31,16 @@
   home.stateVersion = "23.05";
 
   nixpkgs.config = {
-    chromium = { enableWideVine = true; };
-    allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-      "chrome-widevine-cdm"
-      "chromium-unwrapped"
-      "discord"
-      "intelephense"
-      "ungoogled-chromium"
-      "ungoogled-chromium-unwrapped"
-    ];
+    chromium = {enableWideVine = true;};
+    allowUnfreePredicate = pkg:
+      builtins.elem (lib.getName pkg) [
+        "chrome-widevine-cdm"
+        "chromium-unwrapped"
+        "discord"
+        "intelephense"
+        "ungoogled-chromium"
+        "ungoogled-chromium-unwrapped"
+      ];
   };
 
   home.packages = with pkgs; [
@@ -63,19 +67,19 @@
     sbcl
 
     # python
-    (python3.withPackages (pythonPackages: with pythonPackages; [
-      black
-      pylint
-      pylsp-mypy
-      python-lsp-server
-      qtile
-    ]))
+    (python3.withPackages (pythonPackages:
+      with pythonPackages; [
+        black
+        pylint
+        pylsp-mypy
+        python-lsp-server
+        qtile
+      ]))
 
     # langs-extras
     fnlfmt
     lua-language-server
     nil
-    nixpkgs-fmt
     nodePackages.intelephense
     proselint
     shellcheck
@@ -95,7 +99,7 @@
     xh # http request tool. has --download and --continue
 
     # gui
-    (ungoogled-chromium.override { commandLineArgs = ''--js-flags="--jitless --noexpose_wasm" --no-pings ''; })
+    (ungoogled-chromium.override {commandLineArgs = ''--js-flags="--jitless --noexpose_wasm" --no-pings '';})
     discord
     firefox
     krita
@@ -196,7 +200,7 @@
       padding-right = 0
     '';
 
-    "${config.xdg.configHome}/nushell/nix-your-shell.nu".source = pkgs.runCommand "nix-your-shell.nu" { } ''
+    "${config.xdg.configHome}/nushell/nix-your-shell.nu".source = pkgs.runCommand "nix-your-shell.nu" {} ''
       ${pkgs.nix-your-shell}/bin/nix-your-shell nu >> $out
     '';
   };
@@ -252,82 +256,166 @@
     languages = {
       language-server.pylsp.config.pylsp.plugins.pylint.enabled = true;
       language = [
-        { name = "nix"; auto-format = true; formatter = { command = "${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt"; }; }
+        {
+          name = "nix";
+          auto-format = true;
+          formatter = {command = "${pkgs.alejandra}/bin/alejandra";};
+        }
         {
           name = "python";
           auto-format = true;
-          formatter = { command = "${pkgs.black}/bin/black"; args = [ "--quiet" "-" ]; };
+          formatter = {
+            command = "${pkgs.black}/bin/black";
+            args = ["--quiet" "-"];
+          };
         }
       ];
     };
 
     themes = {
-      cjb =
-        let
-          special-blue = "#afd7ff";
-          dark-gray = "#111111";
-          medium-gray = "#222222";
-        in
-        {
-          "attribute" = "light-magenta";
-          "comment" = { fg = "light-cyan"; modifiers = [ "italic" ]; };
-          "constant" = { fg = special-blue; modifiers = [ "bold" ]; };
-          "constant.builtin" = { fg = "magenta"; modifiers = [ "italic" ]; };
-          "constant.character.escape" = "light-cyan";
-          "constant.numeric" = special-blue;
-          "constructor" = "light-blue";
-          "diagnostic" = { modifiers = [ "underlined" ]; };
-          "function" = "light-magenta";
-          "keyword" = { fg = "light-cyan"; modifiers = [ "italic" ]; };
-          "keyword.control" = "red";
-          "keyword.control.return" = { fg = "light-cyan"; modifiers = [ "italic" ]; };
-          "keyword.function" = { fg = special-blue; modifiers = [ "italic" ]; };
-          "label" = "light-magenta";
-          "markup.bold" = { fg = "light-yellow"; modifiers = [ "bold" ]; };
-          "markup.heading" = "light-blue";
-          "markup.italic" = { fg = "light-magenta"; modifiers = [ "italic" ]; };
-          "markup.link.text" = "light-red";
-          "markup.link.url" = { fg = "yellow"; modifiers = [ "underlined" ]; };
-          "markup.list" = "light-red";
-          "markup.quote" = "light-cyan";
-          "markup.raw" = "light-green";
-          "markup.strikethrough" = { modifiers = [ "crossed_out" ]; };
-          "namespace" = "light-magenta";
-          "operator" = "red";
-          "special" = "light-blue";
-          "string" = "light-blue";
-          "type" = { fg = "light-cyan"; modifiers = [ "bold" ]; };
-          "variable" = "white";
-          "variable.builtin" = { fg = "light-cyan"; modifiers = [ "italic" ]; };
-
-          "debug" = { fg = "gray"; modifiers = [ "bold" ]; };
-          "error" = { fg = "light-red"; modifiers = [ "bold" ]; };
-          "hint" = { fg = "gray"; modifiers = [ "bold" ]; };
-          "info" = { fg = "blue"; modifiers = [ "bold" ]; };
-          "warning" = { fg = "yellow"; modifiers = [ "bold" ]; };
-
-          "diff.delta" = "yellow";
-          "diff.minus" = "light-red";
-          "diff.plus" = "green";
-
-          "ui.cursor" = { fg = "light-gray"; modifiers = [ "reversed" ]; };
-          "ui.cursor.match" = { fg = "light-yellow"; modifiers = [ "underlined" ]; };
-          "ui.cursor.primary" = { fg = "light-gray"; modifiers = [ "reversed" ]; };
-          "ui.cursorline" = { bg = dark-gray; };
-          "ui.gutter" = { bg = "black"; };
-          "ui.gutter.selected" = { bg = dark-gray; };
-          "ui.help" = { fg = "white"; bg = "black"; };
-          "ui.linenr" = { fg = "light-gray"; bg = "black"; };
-          "ui.linenr.selected" = { fg = "white"; bg = dark-gray; modifiers = [ "bold" ]; };
-          "ui.menu" = { fg = "light-gray"; bg = dark-gray; };
-          "ui.menu.selected" = { fg = "light-blue"; modifiers = [ "reversed" ]; };
-          "ui.popup" = { bg = dark-gray; };
-          "ui.selection" = { bg = medium-gray; };
-          "ui.statusline" = { fg = "light-gray"; bg = dark-gray; };
-          "ui.statusline.inactive" = { fg = "gray"; bg = "black"; };
-          "ui.virtual.whitespace" = "light-gray";
-          "ui.window" = { bg = "black"; };
+      cjb = let
+        special-blue = "#afd7ff";
+        dark-gray = "#111111";
+        medium-gray = "#222222";
+      in {
+        "attribute" = "light-magenta";
+        "comment" = {
+          fg = "light-cyan";
+          modifiers = ["italic"];
         };
+        "constant" = {
+          fg = special-blue;
+          modifiers = ["bold"];
+        };
+        "constant.builtin" = {
+          fg = "magenta";
+          modifiers = ["italic"];
+        };
+        "constant.character.escape" = "light-cyan";
+        "constant.numeric" = special-blue;
+        "constructor" = "light-blue";
+        "diagnostic" = {modifiers = ["underlined"];};
+        "function" = "light-magenta";
+        "keyword" = {
+          fg = "light-cyan";
+          modifiers = ["italic"];
+        };
+        "keyword.control" = "red";
+        "keyword.control.return" = {
+          fg = "light-cyan";
+          modifiers = ["italic"];
+        };
+        "keyword.function" = {
+          fg = special-blue;
+          modifiers = ["italic"];
+        };
+        "label" = "light-magenta";
+        "markup.bold" = {
+          fg = "light-yellow";
+          modifiers = ["bold"];
+        };
+        "markup.heading" = "light-blue";
+        "markup.italic" = {
+          fg = "light-magenta";
+          modifiers = ["italic"];
+        };
+        "markup.link.text" = "light-red";
+        "markup.link.url" = {
+          fg = "yellow";
+          modifiers = ["underlined"];
+        };
+        "markup.list" = "light-red";
+        "markup.quote" = "light-cyan";
+        "markup.raw" = "light-green";
+        "markup.strikethrough" = {modifiers = ["crossed_out"];};
+        "namespace" = "light-magenta";
+        "operator" = "red";
+        "special" = "light-blue";
+        "string" = "light-blue";
+        "type" = {
+          fg = "light-cyan";
+          modifiers = ["bold"];
+        };
+        "variable" = "white";
+        "variable.builtin" = {
+          fg = "light-cyan";
+          modifiers = ["italic"];
+        };
+
+        "debug" = {
+          fg = "gray";
+          modifiers = ["bold"];
+        };
+        "error" = {
+          fg = "light-red";
+          modifiers = ["bold"];
+        };
+        "hint" = {
+          fg = "gray";
+          modifiers = ["bold"];
+        };
+        "info" = {
+          fg = "blue";
+          modifiers = ["bold"];
+        };
+        "warning" = {
+          fg = "yellow";
+          modifiers = ["bold"];
+        };
+
+        "diff.delta" = "yellow";
+        "diff.minus" = "light-red";
+        "diff.plus" = "green";
+
+        "ui.cursor" = {
+          fg = "light-gray";
+          modifiers = ["reversed"];
+        };
+        "ui.cursor.match" = {
+          fg = "light-yellow";
+          modifiers = ["underlined"];
+        };
+        "ui.cursor.primary" = {
+          fg = "light-gray";
+          modifiers = ["reversed"];
+        };
+        "ui.cursorline" = {bg = dark-gray;};
+        "ui.gutter" = {bg = "black";};
+        "ui.gutter.selected" = {bg = dark-gray;};
+        "ui.help" = {
+          fg = "white";
+          bg = "black";
+        };
+        "ui.linenr" = {
+          fg = "light-gray";
+          bg = "black";
+        };
+        "ui.linenr.selected" = {
+          fg = "white";
+          bg = dark-gray;
+          modifiers = ["bold"];
+        };
+        "ui.menu" = {
+          fg = "light-gray";
+          bg = dark-gray;
+        };
+        "ui.menu.selected" = {
+          fg = "light-blue";
+          modifiers = ["reversed"];
+        };
+        "ui.popup" = {bg = dark-gray;};
+        "ui.selection" = {bg = medium-gray;};
+        "ui.statusline" = {
+          fg = "light-gray";
+          bg = dark-gray;
+        };
+        "ui.statusline.inactive" = {
+          fg = "gray";
+          bg = "black";
+        };
+        "ui.virtual.whitespace" = "light-gray";
+        "ui.window" = {bg = "black";};
+      };
     };
   };
 
@@ -349,7 +437,7 @@
 
   programs.mpv = {
     enable = true;
-    package = (pkgs.mpv.override { scripts = [ pkgs.mpvScripts.mpris ]; });
+    package = pkgs.mpv.override {scripts = [pkgs.mpvScripts.mpris];};
 
     bindings = {
       "q" = "stop";
@@ -552,7 +640,6 @@
         style = "bold bright-red";
       };
       format = "$nix_shell\$hostname\$directory\$git_branch\$git_commit\$git_state\$git_status\$env_var\$status\$character";
-
     };
   };
 
@@ -650,7 +737,7 @@
     NAME = "Christopher Bayliss";
   };
 
-  home.sessionPath = [ "$HOME/.local/bin" ];
+  home.sessionPath = ["$HOME/.local/bin"];
 
   programs.home-manager.enable = true;
 }
