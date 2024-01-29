@@ -28,7 +28,7 @@ def generate_app_list [] {
     | str replace -r ' -- %.| %.' ''
     | to text | from csv | transpose | headers
   }
-  | flatten | uniq | select name command | sort
+  | flatten | uniq | select name command | sort | append [[name,command];[poweroff,poweroff],[reboot,reboot]]
 }
 
 def main [] {

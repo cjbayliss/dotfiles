@@ -89,6 +89,7 @@
     bubblewrap
     lm_sensors
     nixpkgs-review
+    nushell # for xmobar and qtile's bar
     playerctl
     podman-compose
     scrot
@@ -198,10 +199,6 @@
       padding-bottom = 2
       padding-left = 0
       padding-right = 0
-    '';
-
-    "${config.xdg.configHome}/nushell/nix-your-shell.nu".source = pkgs.runCommand "nix-your-shell.nu" {} ''
-      ${pkgs.nix-your-shell}/bin/nix-your-shell nu >> $out
     '';
   };
 
@@ -585,126 +582,108 @@
     '';
   };
 
-  programs.starship = {
+  programs.fish = {
     enable = true;
-    enableNushellIntegration = true;
-    settings = {
-      add_newline = false;
-      character = {
-        format = "» ";
-      };
-      cmd_duration = {
-        disabled = true;
-      };
-      directory = {
-        fish_style_pwd_dir_length = 1;
-        format = "[$path]($style) ";
-        style = "bright-cyan";
-        truncate_to_repo = false;
-        truncation_length = 1;
-      };
+    interactiveShellInit = ''
+      set fish_greeting
 
-      git_branch = {
-        format = "[$branch]($style) ";
-        style = "bright-purple";
-      };
-      git_commit = {
-        format = "(\\($hash$tag\\) )";
-      };
-      git_status = {
-        format = "([$all_status$ahead_behind]($style) )";
-        style = "purple";
-        conflicted = "!!";
-        deleted = "D";
-        modified = "M";
-        renamed = "R";
-        staged = "S";
-        ahead = "";
-        behind = "B";
-        diverged = "#";
-      };
+      if command -q nix-your-shell
+        nix-your-shell fish | source
+      end
 
-      hostname = {
-        format = "[$hostname](bright-white) ";
-        ssh_only = false;
-      };
-      line_break = {
-        disabled = true;
-      };
-      status = {
-        disabled = false;
-        format = "[$status]($style) ";
-      };
-      nix_shell = {
-        format = "[\\[nix-$name\\]]($style) ";
-        style = "bold bright-red";
-      };
-      format = "$nix_shell\$hostname\$directory\$git_branch\$git_commit\$git_state\$git_status\$env_var\$status\$character";
-    };
-  };
+      # allow urls with '?' in them
+      set -U fish_features qmark-noglob
 
-  programs.nushell = {
-    enable = true;
-    environmentVariables = {
-      # vancy colours in man pages
-      LESS_TERMCAP_mb = "(tput bold; tput setaf 1)";
-      LESS_TERMCAP_md = "(tput bold; tput setaf 1)";
-      LESS_TERMCAP_me = "(tput sgr0)";
-      LESS_TERMCAP_so = "(tput bold; tput setaf 12)";
-      LESS_TERMCAP_se = "(tput sgr0)";
-      LESS_TERMCAP_us = "(tput bold; tput setaf 14)";
-      LESS_TERMCAP_ue = "(tput sgr0)";
+      # colours
+      set -U fish_color_autosuggestion      brblue
+      set -U fish_color_cancel              -r
+      set -U fish_color_command             'white' '--bold'
+      set -U fish_color_comment             brblue
+      set -U fish_color_cwd                 brcyan
+      set -U fish_color_cwd_root            red
+      set -U fish_color_end                 brmagenta
+      set -U fish_color_error               brred
+      set -U fish_color_escape              brcyan
+      set -U fish_color_history_current     --bold
+      set -U fish_color_host                normal
+      set -U fish_color_match               --background=brblue
+      set -U fish_color_normal              normal
+      set -U fish_color_operator            normal
+      set -U fish_color_param               normal
+      set -U fish_color_quote               yellow
+      set -U fish_color_redirection         bryellow
+      set -U fish_color_search_match        'bryellow' '--background=brblack'
+      set -U fish_color_selection           'white' '--bold' '--background=brblack'
+      set -U fish_color_status              red
+      set -U fish_color_user                green
+      set -U fish_color_valid_path          --underline
+      set -U fish_pager_color_completion    normal
+      set -U fish_pager_color_description   yellow
+      set -U fish_pager_color_prefix        'white' '--bold' '--underline'
+      set -U fish_pager_color_progress      '-r' 'white'
 
-      # required for colours in man pages to work
-      GROFF_NO_SGR = "1";
-    };
+      alias ps "echo \"don't you mean procs(1)?\""
 
-    configFile = {
-      text = ''
-        $env.config.show_banner = false
-        # stuff that doesn't support nushell
-        $env.NIX_PATH = $"(bash -lc 'echo $NIX_PATH')"
-        $env.SSH_AUTH_SOCK = $"(bash -lc 'echo $SSH_AUTH_SOCK')"
-        source ${config.xdg.configHome}/nushell/nix-your-shell.nu
-        use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/git/git-completions.nu *
-        use ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/nix/nix-completions.nu *
+      # man colours
+      export LESS_TERMCAP_mb="$(tput bold; tput setaf 1)"
+      export LESS_TERMCAP_md="$(tput bold; tput setaf 1)"
+      export LESS_TERMCAP_me="$(tput sgr0)"
+      export LESS_TERMCAP_so="$(tput bold; tput setaf 12)"
+      export LESS_TERMCAP_se="$(tput sgr0)"
+      export LESS_TERMCAP_us="$(tput bold; tput setaf 14)"
+      export LESS_TERMCAP_ue="$(tput sgr0)"
+      # required for man colours to work
+      export GROFF_NO_SGR=1;
 
-        def colours [] {
-          nu ${pkgs.nu_scripts}/share/nu_scripts/modules/coloring/256_color_testpattern.nu
-        }
+      # prompt
+      function __git_branch
+          git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/'
+      end
 
-        def --wrapped jr [...rest] {
-          let package = (
-            open /nix/var/nix/profiles/per-user/root/channels/nixos/programs.sqlite |
-            query db $"select package from Programs where system = '(uname -m)-linux' and name = '($rest.0)'" |
-            get package.0
-          )
-          mut cmd = $rest;
-          for arg in $cmd { if ($arg | path exists) { $cmd = ($cmd | str replace $arg $"'($arg)'") } }
-          ^nix-shell -p $package --run $'($cmd | str join " ")'
-        }
+      function __git_status
+          if [ (git ls-files 2>/dev/null | wc -l) -lt 2000 ]
+              git status --short 2>/dev/null | sed 's/^ //g' | cut -d' ' -f1 | sort -u | tr -d '\n' | sed 's/^/ /'
+          else
+              printf " [NOSTAT]"
+          end
+      end
 
-        $env.config.hooks.command_not_found = {
-          |cmd_name| (
-            try {
-              let cnf_pkgs = (
-                open /nix/var/nix/profiles/per-user/root/channels/nixos/programs.sqlite |
-                query db $"select package from Programs where system = '(uname -m)-linux' and name = '($cmd_name)'"
-              )
-              if not ($cnf_pkgs | is-empty) {
-                $"\nMaybe try:\n  nix-shell -p " + ($cnf_pkgs | get package | str join "\n  nix-shell -p ")
-              }
-            }
-          )
-        }
-      '';
-    };
+      function fish_right_prompt
+          set -l last_status $status
+          if [ $last_status -ne 0 ]
+              set_color --bold $fish_color_error
+              printf '%s ' $last_status
+              set_color normal
+          end
+      end
 
-    loginFile = {
-      text = ''
-        if ($env.DISPLAY? | is-empty) and ($env.XDG_VTNR == "1") { exec sx }
-      '';
-    };
+      function fish_prompt
+          # host
+          set_color normal
+          printf '%s ' (prompt_hostname)
+
+          # pwd
+          set_color $fish_color_cwd
+          echo -n (prompt_pwd)
+          set_color normal
+
+          # git stuff
+          set_color brmagenta
+          printf '%s' (__git_branch)
+          set_color magenta
+          printf '%s ' (__git_status)
+          set_color normal
+
+          # prompt delimiter
+          echo -n '» '
+      end
+    '';
+
+    loginShellInit = ''
+      if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]
+          exec sx
+      end
+    '';
   };
 
   programs.yt-dlp = {

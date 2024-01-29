@@ -49,7 +49,7 @@ keys = [
     EzKey("M-S-q", lazy.shutdown()),  # exit qtile
     EzKey(
         "M-p",
-        lazy.spawn("j4-dmenu-desktop --dmenu='tofi' --no-generic"),
+        lazy.spawn("dmenu-apps"),
     ),  # tofi is like dmenu
     EzKey(
         "M-<equal>", lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ +2%")

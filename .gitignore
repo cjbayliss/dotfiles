@@ -16,4 +16,5 @@
 !.config/xmonad/bar.hs
 !.config/xmonad/xmonad.hs
 !.local/bin/dmenu-apps
+!.local/bin/jr
 !user.js
