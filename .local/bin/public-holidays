@@ -1,0 +1,11 @@
+#!/usr/bin/env nu
+
+# get a list of victorian public holidays. requires the query plugin from:
+# https://github.com/nushell/nushell/tree/main/crates/nu_plugin_query
+http get -e https://business.vic.gov.au/business-information/public-holidays/victorian-public-holidays-2024
+  | query web --query 'table'
+  | str trim | lines | skip 1
+  | find -v -r '^ +$'
+  | str replace -r '^ +' '' | str replace -r '[0-9]$| $' ''
+  | window 2 --stride 2
+  | each {|r| {name: $r.0 date: $r.1}}

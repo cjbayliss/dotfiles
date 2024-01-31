@@ -17,4 +17,5 @@
 !.config/xmonad/xmonad.hs
 !.local/bin/dmenu-apps
 !.local/bin/jr
+!.local/bin/public-holidays
 !user.js
