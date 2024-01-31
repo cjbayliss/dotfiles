@@ -51,6 +51,7 @@
     hsetroot
     mangohud
     nix-your-shell
+    nushellPlugins.query
     pulseaudio # for pactl
     sx
     tofi
@@ -96,7 +97,6 @@
 
     # replacements written in rust
     procs # ps
-    uutils-coreutils-noprefix # coreutils
     xh # http request tool. has --download and --continue
 
     # gui
@@ -684,6 +684,49 @@
           exec sx
       end
     '';
+  };
+
+  programs.nushell = {
+    enable = true;
+    environmentVariables = {
+      # vancy colours in man pages
+      LESS_TERMCAP_mb = "(tput bold; tput setaf 1)";
+      LESS_TERMCAP_md = "(tput bold; tput setaf 1)";
+      LESS_TERMCAP_me = "(tput sgr0)";
+      LESS_TERMCAP_so = "(tput bold; tput setaf 12)";
+      LESS_TERMCAP_se = "(tput sgr0)";
+      LESS_TERMCAP_us = "(tput bold; tput setaf 14)";
+      LESS_TERMCAP_ue = "(tput sgr0)";
+
+      # required for colours in man pages to work
+      GROFF_NO_SGR = "1";
+    };
+
+    configFile = {
+      text = ''
+        $env.config.show_banner = false
+        # stuff that doesn't support nushell
+        $env.NIX_PATH = $"(bash -lc 'echo $NIX_PATH')"
+        $env.SSH_AUTH_SOCK = $"(bash -lc 'echo $SSH_AUTH_SOCK')"
+        $env.PATH = $"(bash -lc 'echo $PATH')"
+
+        register ${pkgs.nushellPlugins.query}/bin/nu_plugin_query
+
+        $env.config.hooks.command_not_found = {
+          |cmd_name| (
+            try {
+              let cnf_pkgs = (
+                open /nix/var/nix/profiles/per-user/root/channels/nixos/programs.sqlite |
+                query db $"select package from Programs where system = '(uname -m)-linux' and name = '($cmd_name)'"
+              )
+              if not ($cnf_pkgs | is-empty) {
+                $"\nMaybe try:\n  nix-shell -p " + ($cnf_pkgs | get package | str join "\n  nix-shell -p ")
+              }
+            }
+          )
+        }
+      '';
+    };
   };
 
   programs.yt-dlp = {
