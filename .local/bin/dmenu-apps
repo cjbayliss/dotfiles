@@ -26,7 +26,7 @@ def generate_app_list [] {
     | str replace 'Name=' 'name,'
     | str replace 'Exec=' 'command,'
     | str replace -r ' -- %.| %.' ''
-    | to text | from csv | transpose | headers
+    | to text | from csv --flexible | transpose | headers
   }
   | flatten | uniq | select name command | sort | append [[name,command];[poweroff,poweroff],[reboot,reboot]]
 }
