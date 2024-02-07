@@ -444,7 +444,7 @@
 
     config = {
       script-opts = "ytdl_hook-ytdl_path=yt-dlp";
-      ytdl-format = "[format_id*=adaptive_hls-audio-jaJP][height<=?1080]/bestvideo[height<=?1080]+bestaudio/best";
+      ytdl-format = "[format_id*=adaptive_hls-audio-jaJP][height<=?480]/bestvideo[height<=?480]+bestaudio/best";
       slang = "eng,en,enUS";
       cache = "auto";
       embeddedfonts = "no";
