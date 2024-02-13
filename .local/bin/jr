@@ -56,9 +56,17 @@ def nix_shell(package: str, program: str, arguments: str) -> None:
 
 
 def main() -> None:  # pylint: disable=C0116
-    if len(sys.argv) < 2:
-        print("usage: jr program [PATH]")
+    if len(sys.argv) < 2 or sys.argv[1] == "-h":
+        print("usage: jr [-p PACKAGE] program [PATH]")
         sys.exit(1)
+
+    if sys.argv[1] == "-p":
+        nix_shell(
+            package=sys.argv[2],
+            program=sys.argv[3],
+            arguments="".join(escape_paths(sys.argv[4:])),
+        )
+        return
 
     program = sys.argv[1]
     package = get_close_matches(
