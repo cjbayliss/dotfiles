@@ -531,6 +531,9 @@
   programs.tmux = {
     enable = true;
     extraConfig = ''
+      # count from 1 not zero (this makes keybindings line up with the pane index)
+      set -g base-index 1
+      setw -g pane-base-index 1
       # status bar config
       set -g status-position top
       set -g status-style "fg=white bg=black"
@@ -570,15 +573,15 @@
       bind-key -n "M-;" command-prompt
 
       # fast window switching/creation
-      bind-key -n "M-1" run-shell "tmux select-window -t0 || tmux new-window"
-      bind-key -n "M-2" run-shell "tmux select-window -t1 || tmux new-window"
-      bind-key -n "M-3" run-shell "tmux select-window -t2 || tmux new-window"
-      bind-key -n "M-4" run-shell "tmux select-window -t3 || tmux new-window"
-      bind-key -n "M-5" run-shell "tmux select-window -t4 || tmux new-window"
-      bind-key -n "M-6" run-shell "tmux select-window -t5 || tmux new-window"
-      bind-key -n "M-7" run-shell "tmux select-window -t6 || tmux new-window"
-      bind-key -n "M-8" run-shell "tmux select-window -t7 || tmux new-window"
-      bind-key -n "M-9" run-shell "tmux select-window -t8 || tmux new-window"
+      bind-key -n "M-1" run-shell "tmux select-window -t1 || tmux new-window"
+      bind-key -n "M-2" run-shell "tmux select-window -t2 || tmux new-window"
+      bind-key -n "M-3" run-shell "tmux select-window -t3 || tmux new-window"
+      bind-key -n "M-4" run-shell "tmux select-window -t4 || tmux new-window"
+      bind-key -n "M-5" run-shell "tmux select-window -t5 || tmux new-window"
+      bind-key -n "M-6" run-shell "tmux select-window -t6 || tmux new-window"
+      bind-key -n "M-7" run-shell "tmux select-window -t7 || tmux new-window"
+      bind-key -n "M-8" run-shell "tmux select-window -t8 || tmux new-window"
+      bind-key -n "M-9" run-shell "tmux select-window -t9 || tmux new-window"
     '';
   };
 
