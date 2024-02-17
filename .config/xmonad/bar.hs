@@ -8,33 +8,32 @@ Config
   , commands =
       [ Run
           ComX
-          "nu"
+          "sh"
           [ "-c"
-          , "ip -j a | from json | where operstate == UP | get addr_info | first | get local | to text"
+          , "ip -j a | jq -r 'first(.[] | select(.operstate == \"UP\") | .addr_info[] | .local)'"
           ]
           "DOWN"
           "arp"
           10
       , Run
           Com
-          "nu"
-          ["-c", "pactl get-sink-volume @DEFAULT_SINK@ | split column -r '\\s+' | get column5 | to text"]
+          "sh"
+          ["-c", "pactl get-sink-volume @DEFAULT_SINK@ | awk '/Volume:/ {print $5}'"]
           "volume"
           10
       , Run
           Com
-          "nu"
+          "sh"
           [ "-c"
-          , "if (pactl get-sink-mute @DEFAULT_SINK@ | split column -r '\\s+' | get column2 | to text) == yes { print 'AUDIO OFF' }"
+          , "pactl get-sink-mute @DEFAULT_SINK@ | sed -e 's/Mute: yes/AUDIO OFF/' -e 's/Mute: no//'"
           ]
           "audioStatus"
           10
       , Run
           Com
-          "nu"
-          [ "-c" -- r1r07e is the "geohash" for Bright
-                 -- See https://github.com/bremor/bureau_of_meteorology/blob/9b20d1d/api%20doc/API.mdon
-          , "(http get https://api.weather.bom.gov.au/v1/locations/r1r07e/observations | from json).data.temp | append °C | str join"
+          "sh"
+          [ "-c"
+          , "bom"
           ]
           "temperature"
           9000
