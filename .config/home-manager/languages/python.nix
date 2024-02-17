@@ -7,6 +7,7 @@
     (python3.withPackages (pythonPackages:
       with pythonPackages; [
         black
+        desktop-entry-lib
         pylint
         pylsp-mypy
         python-lsp-server

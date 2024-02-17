@@ -1,41 +1,85 @@
-#!/usr/bin/env nu
+#!/usr/bin/env python3
+# pylint: disable=C0103
+"""
+dmenu-apps find the .desktop applications and opens a picker in a menu program,
+then executes the matching command from that selection.
+"""
 
-# custom dmenu
-def dmenu [] {
-  if ($env.XDG_SESSION_TYPE == 'wayland') {
-    tofi
-  } else {
-    ^dmenu -i -fn 'Iosevka-11.5:semibold' -nb '#000' -nf '#fff' -sb '#000' -sf '#b6a0ff'
-  }
-}
+import os
+import subprocess
+from pathlib import Path
+from typing import Dict, List
 
-# function to generate the application list
-def generate_app_list [] {
-  $env.XDG_DATA_DIRS | split row ':' | append '~/.local/share'
-  | each {||
-    if ($'($in)/applications' | path exists) {
-      glob $'($in)/applications/**'
-    }
-  }
-  | flatten | wrap name | where name =~ '\.desktop' | get name
-  | each {||
-    open $in
-    | split row -r '\n'
-    | find -r '^Name=|^Exec='
-    | get 0 1
-    | str replace 'Name=' 'name,'
-    | str replace 'Exec=' 'command,'
-    | str replace -r ' -- %.| %.' ''
-    | to text | from csv --flexible | transpose | headers
-  }
-  | flatten | uniq | select name command | sort | append [[name,command];[poweroff,poweroff],[reboot,reboot]]
-}
+import desktop_entry_lib
 
-def main [] {
-  let $apps = generate_app_list
-  let $selection = ($apps | get name | to text | dmenu | str replace -r '\n' '')
 
-  if not ($selection | is-empty) {
-    sh -c $'($apps | where name == $selection | get command | to text) &'
-  }
-}
+def get_menu_command(display_type: str) -> List[str]:
+    """return menu command dpending on display type"""
+    if display_type == "wayland":
+        return ["tofi"]
+
+    return [
+        "dmenu",
+        "-i",
+        "-fn",
+        "Iosevka-11.5:semibold",
+        "-nb",
+        "#000",
+        "-nf",
+        "#fff",
+        "-sb",
+        "#000",
+        "-sf",
+        "#b6a0ff",
+    ]
+
+
+def get_desktop_entries(
+    entries: desktop_entry_lib.DesktopEntryCollection, xdg_data_dirs: List[str]
+) -> Dict[str, str]:
+    """return a dictionary of applications in the format of {name: str}:{command: str}"""
+    for xdg_data_dir in xdg_data_dirs:
+        applications_dir = f"{xdg_data_dir}/applications"
+        if os.path.exists(applications_dir):
+            entries.load_directory(applications_dir)
+
+    applications = {}
+    for entry in entries.get_visible_entries():
+        if entry.should_show_in_menu() and entry.Exec:
+            applications[entry.Name.default_text] = entry.Exec
+
+    applications.update({"poweroff": "poweroff", "reboot": "reboot"})
+    return applications
+
+
+def main(
+    menu_cmd: List[str], applications: Dict[str, str], field_codes: List[str]
+) -> None:
+    """run the selected application"""
+    with subprocess.Popen(
+        menu_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True
+    ) as process:
+        output, _ = process.communicate(input="\n".join(applications.keys()))
+        if output:
+            # pylint: disable-next=R1732
+            subprocess.Popen(
+                [
+                    code
+                    for code in (applications[output.strip("\n")] or "").split()
+                    if code not in field_codes
+                ],
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                close_fds=True,
+            )
+
+
+if __name__ == "__main__":
+    data_dirs = desktop_entry_lib.get_xdg_data_dirs()
+    data_dirs.append(str(Path.home() / ".local" / "share"))
+    main(
+        get_menu_command(os.environ.get("XDG_SESSION_TYPE") or ""),
+        get_desktop_entries(desktop_entry_lib.DesktopEntryCollection(), data_dirs),
+        ["%f", "%F", "%u", "%U"],
+    )
