@@ -2,7 +2,6 @@
   home.packages = with pkgs; [
     # langs
     chicken
-    fennel
     gcc
     ghc
     nodejs_20

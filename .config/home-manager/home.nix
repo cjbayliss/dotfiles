@@ -7,6 +7,7 @@
 
     # languages
     ./languages/bucket.nix # langs not being managed by home-manager
+    ./languages/lua.nix
     ./languages/python.nix
 
     # programs
