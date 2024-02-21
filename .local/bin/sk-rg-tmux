@@ -1,0 +1,25 @@
+#!/bin/sh
+
+current_dir="$(tmux list-windows -F "#{pane_current_path} #F" | grep '\*' | cut -d ' ' -f1)"
+
+file="$(sk --delimiter ':' \
+           --ansi -i -c "rg --color=always --line-number \"{}\" --hidden $current_dir" \
+           --preview 'bat --color=always {1} --highlight-line {2}' \
+           --preview-window '+{2}-10' \
+           | awk -F ':' '{print $1 ":" $2}')"
+
+if [ -n "$file" ]; then
+  hxopen="$(tmux list-windows -a 2>/dev/null | grep hx | head -n1 | awk -F ':' '{print $1 ":" $2}')"
+  hxopenfocused="$(tmux list-windows -a 2>/dev/null | grep hx | head -n1 | grep '\*')"
+
+  if [ -n "$hxopen" ]; then
+    tmux send-keys -t "$hxopen" 'Escape' &&
+    tmux send-keys -t "$hxopen" -l ":open $file" &&
+    tmux send-keys -t "$hxopen" 'Enter' &&
+    if [ -z "$hxopenfocused" ]; then
+      tmux select-window -t "$hxopen"
+    fi
+  else
+    tmux new-window -n hx "hx $file"
+  fi
+fi
