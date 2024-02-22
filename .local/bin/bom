@@ -10,11 +10,11 @@
                    :/observations))
 
 (fn fetch_weather_data [url]
-  (local (data response) (http.request url))
-  (if (= response 200)
-      (let [weather_data (json.decode data)]
-        (.. weather_data.data.temp "°C"))
-      (.. :N/A)))
+  (let [(data response) (http.request url)]
+    (if (= response 200)
+        (let [weather_data (json.decode data)]
+          (.. weather_data.data.temp "°C"))
+        (.. :N/A))))
 
 (print (fetch_weather_data bom_url))
 
