@@ -1,6 +1,6 @@
 {...}: {
   programs.ripgrep = {
     enable = true;
-    arguments = ["--no-heading"];
+    arguments = ["--hyperlink-format=vscode" "--no-heading"];
   };
 }

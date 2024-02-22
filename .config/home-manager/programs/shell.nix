@@ -105,6 +105,10 @@
           exec sx
       end
     '';
+
+    shellAliases = {
+      ls = "ls --hyperlink";
+    };
   };
 
   home.sessionVariables = {

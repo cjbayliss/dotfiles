@@ -23,6 +23,7 @@
       # allow italics
       set -g default-terminal xterm-256color
       set -ga terminal-overrides ",*:RGB"
+      set -ga terminal-features ",*:hyperlinks"
 
       # don"t intercept ESC
       set -sg escape-time 25
@@ -41,6 +42,8 @@
           split-window -v -l 25% "TMUX= tmux new-session -A -s scratch \\; set status off"
       }
 
+      # open ripgrep results in helix
+      bind-key -T root MouseUp1Pane run-shell "tmux-open #{mouse_hyperlink}"
 
       # easy open command-prompt
       bind-key -n "M-;" command-prompt
