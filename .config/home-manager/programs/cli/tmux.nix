@@ -1,7 +1,12 @@
-{...}: {
-  programs.tmux = {
-    enable = true;
-    extraConfig = ''
+{pkgs, ...}: {
+  # NOTE: the home-manager tmux module is defective, it forces bad defaults
+  # without a way to dsiable them
+  home.packages = with pkgs; [
+    tmux
+  ];
+
+  xdg.configFile."tmux/tmux.conf" = {
+    text = ''
       # count from 1 not zero (this makes keybindings line up with the pane index)
       set -g base-index 1
       setw -g pane-base-index 1
@@ -21,7 +26,6 @@
       set -g set-titles-string "#T"
 
       # allow italics
-      set -g default-terminal xterm-256color
       set -ga terminal-overrides ",*:RGB"
       set -ga terminal-features ",*:hyperlinks"
 
