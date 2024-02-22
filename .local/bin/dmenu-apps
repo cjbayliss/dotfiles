@@ -13,27 +13,6 @@ from typing import Dict, List
 import desktop_entry_lib
 
 
-def get_menu_command(display_type: str) -> List[str]:
-    """return menu command dpending on display type"""
-    if display_type == "wayland":
-        return ["tofi"]
-
-    return [
-        "dmenu",
-        "-i",
-        "-fn",
-        "Iosevka-11.5:semibold",
-        "-nb",
-        "#000",
-        "-nf",
-        "#fff",
-        "-sb",
-        "#000",
-        "-sf",
-        "#b6a0ff",
-    ]
-
-
 def get_desktop_entries(
     entries: desktop_entry_lib.DesktopEntryCollection, xdg_data_dirs: List[str]
 ) -> Dict[str, str]:
@@ -79,7 +58,20 @@ if __name__ == "__main__":
     data_dirs = desktop_entry_lib.get_xdg_data_dirs()
     data_dirs.append(str(Path.home() / ".local" / "share"))
     main(
-        get_menu_command(os.environ.get("XDG_SESSION_TYPE") or ""),
+        [
+            "dmenu",
+            "-i",
+            "-fn",
+            "Iosevka-11.5:semibold",
+            "-nb",
+            "#000",
+            "-nf",
+            "#fff",
+            "-sb",
+            "#000",
+            "-sf",
+            "#b6a0ff",
+        ],
         get_desktop_entries(desktop_entry_lib.DesktopEntryCollection(), data_dirs),
         ["%f", "%F", "%u", "%U"],
     )

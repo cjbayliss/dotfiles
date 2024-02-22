@@ -2,7 +2,6 @@
   imports = [
     # desktop
     ./desktop/common.nix
-    ./desktop/wayland.nix
     ./desktop/x11.nix
 
     # languages
