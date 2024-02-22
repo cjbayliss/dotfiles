@@ -41,8 +41,6 @@
           split-window -v -l 25% "TMUX= tmux new-session -A -s scratch \\; set status off"
       }
 
-      # find and open
-      bind-key -n "M-f" display-popup -E -w 85% -h 85% 'sk-rg-tmux'
 
       # easy open command-prompt
       bind-key -n "M-;" command-prompt
