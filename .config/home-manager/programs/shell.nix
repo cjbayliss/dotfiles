@@ -107,7 +107,7 @@
     '';
 
     shellAliases = {
-      ls = "ls --hyperlink";
+      ls = "ls --hyperlink --color=auto";
     };
   };
 
