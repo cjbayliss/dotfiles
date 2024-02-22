@@ -64,7 +64,7 @@ def main() -> None:  # pylint: disable=C0116
         nix_shell(
             package=sys.argv[2],
             program=sys.argv[3],
-            arguments="".join(escape_paths(sys.argv[4:])),
+            arguments=" ".join(escape_paths(sys.argv[4:])),
         )
         return
 
