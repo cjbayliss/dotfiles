@@ -1,9 +1,9 @@
 {pkgs, ...}: let
-  lepton = pkgs.fetchFromGitHub {
-    owner = "black7375";
-    repo = "Firefox-UI-Fix";
-    rev = "v8.6.0";
-    hash = "sha256-+TNEtdYePMVBLRUJyzZOKgzFr8tqfqmxy8NfaABP1jw=";
+  wavefox = pkgs.fetchFromGitHub {
+    owner = "QNetITQ";
+    repo = "WaveFox";
+    rev = "v1.6.123";
+    hash = "sha256-uVGNJKtT8MHo5a+GTW6DfpuRiCukC4e4UdnKmWIk3Zw=";
   };
 in {
   programs.firefox = {
@@ -403,19 +403,20 @@ in {
         "webchannel.allowObject.urlWhitelist" = "";
         "webextensions.storage.sync.serverURL" = "";
 
-        # normal tabs using "Firefox-UI-Fix"
-        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+        # normal tabs using "WaveFox"
         "svg.context-properties.content.enabled" = true;
-        "layout.css.has-selector.enabled" = true;
-        "userChrome.tab.lepton_like_padding" = false;
-        "userChrome.tab.photon_like_padding" = true;
-        "userChrome.tab.box_shadow" = false;
+        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+        "userChrome.DarkTheme.Tabs.Borders.Enabled" = true;
+        "userChrome.DarkTheme.Tabs.Shadows.Saturation.Low.Enabled" = true;
+        "userChrome.Menu.Icons.Regular.Enabled" = true;
+        "userChrome.Tabs.Option6.Enabled" = true;
+        "userChrome.Tabs.SelectedTabIndicator.Enabled" = true;
       };
       userChrome = ''
-        @import url("file://${lepton}/css/leptonChrome.css");
-      '';
-      userContent = ''
-        @import url("file://${lepton}/css/leptonContent.css");
+        @import url("file://${wavefox}/chrome/userChrome.css");
+        #tabbrowser-tabs ~ #alltabs-button::after {
+          display: none !important;
+        }
       '';
     };
   };
