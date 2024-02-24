@@ -248,6 +248,7 @@ in {
         "identity.fxaccounts.enabled" = false;
         "javascript.options.asmjs" = false; # NOTE: breaks wasm
         "javascript.options.wasm" = false; # NOTE: breaks wasm
+        "layout.css.scrollbar-width-thin.disabled" = true;
         "marionette.prefs.recommended" = false;
         "media.peerconnection.enabled" = false;
         "network.IDN_show_punycode" = true;
