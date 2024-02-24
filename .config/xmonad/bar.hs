@@ -1,6 +1,6 @@
 Config
   { font =
-      "Iosevka, IPAGothic Regular 11.5, Baekmuk Gulim Regular 11.5, Noto Color Emoji Regular 10, Regular 11.5"
+      "Iosevka, IPAGothic Regular 11.5, NanumGothicCoding Regular 11.5, Noto Color Emoji Regular 10, Regular 11.5"
   , dpi = 108
   , bgColor = "#000000"
   , fgColor = "#ffffff"
