@@ -39,9 +39,9 @@
     enable = true;
 
     font = {
-      name = "Inter";
-      package = pkgs.inter;
-      size = 12;
+      name = "Liberation Sans";
+      package = pkgs.liberation_ttf;
+      size = 11;
     };
 
     gtk3.extraConfig = {
