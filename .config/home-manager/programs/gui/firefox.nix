@@ -1,11 +1,4 @@
-{pkgs, ...}: let
-  wavefox = pkgs.fetchFromGitHub {
-    owner = "QNetITQ";
-    repo = "WaveFox";
-    rev = "v1.6.123";
-    hash = "sha256-uVGNJKtT8MHo5a+GTW6DfpuRiCukC4e4UdnKmWIk3Zw=";
-  };
-in {
+{pkgs, ...}: {
   programs.firefox = {
     enable = true;
     policies = {
@@ -404,19 +397,38 @@ in {
         "webchannel.allowObject.urlWhitelist" = "";
         "webextensions.storage.sync.serverURL" = "";
 
-        # normal tabs using "WaveFox"
-        "svg.context-properties.content.enabled" = true;
+        # for normal tabs
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-        "userChrome.DarkTheme.Tabs.Borders.Enabled" = true;
-        "userChrome.DarkTheme.Tabs.Shadows.Saturation.Low.Enabled" = true;
-        "userChrome.Menu.Icons.Regular.Enabled" = true;
-        "userChrome.Tabs.Option6.Enabled" = true;
-        "userChrome.Tabs.SelectedTabIndicator.Enabled" = true;
       };
+
       userChrome = ''
-        @import url("file://${wavefox}/chrome/userChrome.css");
-        #tabbrowser-tabs ~ #alltabs-button::after {
-          display: none !important;
+        :root {
+          --tab-min-height: 37px !important;
+        }
+        :root[uidensity="compact"] {
+          --tab-min-height: 31px !important;
+        }
+
+        :root[uidensity="touch"] {
+          --tab-min-height: 41px !important;
+        }
+
+        .tab-background {
+          border-radius: 0px 0px !important;
+          margin-bottom: 0px !important;
+          margin-top: 0px !important;
+        }
+
+        .tabbrowser-tab[visuallyselected][usercontextid] .tab-background {
+          box-shadow: inset 0 -2px 0 var(--tab-loading-fill) !important;
+        }
+
+        .tabbrowser-tab[visuallyselected]:not([usercontextid]) .tab-background {
+          box-shadow: inset 0 2px 0 var(--tab-loading-fill) !important;
+        }
+
+        #tabbrowser-tabs:not([secondarytext-unsupported]) .tab-label-container {
+          height: unset !important;
         }
       '';
     };
