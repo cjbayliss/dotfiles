@@ -1,8 +1,9 @@
+[Adblock Plus 3.13]
 ! Title: Custom
 ! Description: |
 !       my custom ublock list
 ! Expires: 7 days
-! Last modified: 2024-02-24T23:01:13+00:00
+! Last modified: 2024-02-26T22:09:01+00:00
 ! Homepage: https://github.com/cjbayliss/dotfiles
 
 ! all
@@ -95,7 +96,8 @@ nix-community.github.io##code.filename > a:style(color:#93ff93 !important;)
 ! centre daniel's site to reduce neck strain when reading it
 daniel.haxx.se##.site:style(margin:auto !important)
 
-! make wikipedia's ToC behave like the old design
+! sticky toc fixes
+nix.dev##.bd-sidebar-primary:style(position:unset !important;max-height:unset !important;display:unset !important;)
 wikipedia.org##.vector-sticky-pinned-container:style(position:unset !important;max-height:unset !important;)
 
 ! accessibilty fixes
