@@ -173,6 +173,26 @@
             definedAliases = ["!dp"];
           };
 
+          "Firefox Addons" = {
+            urls = [
+              {
+                template = "https://addons.mozilla.org/en-US/firefox/search/";
+                params = [
+                  {
+                    name = "q";
+                    value = "{searchTerms}";
+                  }
+                  {
+                    name = "type";
+                    value = "extension";
+                  }
+                ];
+              }
+            ];
+            iconUpdateURL = "https://addons.mozilla.org/favicon.ico";
+            definedAliases = ["!fa"];
+          };
+
           "Bing".metaData.alias = "!b";
           "DuckDuckGo".metaData.alias = "!d";
           "Google".metaData.alias = "!g";
@@ -428,7 +448,7 @@
         }
 
         #tabbrowser-tabs:not([secondarytext-unsupported]) .tab-label-container {
-          height: unset !important;
+          height: var(--tab-min-height) !important;
         }
       '';
     };
