@@ -16,6 +16,7 @@
     ./programs/cli/ripgrep.nix
     ./programs/cli/tmux.nix
     ./programs/cli/yt-dlp.nix
+    ./programs/desktop-entries.nix
     ./programs/editor.nix
     ./programs/gui/bucket.nix # gui programs not being managed by home-manager
     ./programs/gui/firefox.nix
