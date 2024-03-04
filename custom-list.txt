@@ -3,7 +3,7 @@
 ! Description: |
 !       my custom ublock list
 ! Expires: 7 days
-! Last modified: 2024-02-26T22:09:01+00:00
+! Last modified: 2024-03-04T21:15:37+00:00
 ! Homepage: https://github.com/cjbayliss/dotfiles
 
 ! all
@@ -69,12 +69,16 @@ fandom.com##.global-registration-buttons
 duckduckgo.com##.ddg-extension-hide
 duckduckgo.com##.js-text-promo
 
+! highlight search results
+duckduckgo.com##b:style(background-color:#33f !important;color:#fff !important)
+
 ! PC Case Gear
 www.pccasegear.com##.right-banner
 www.pccasegear.com##.left-banner
 
 ! GitHub
 github.com##.dashboard-changelog
+github.com##article.my-4.color-bg-default.color-shadow-small.rounded.border
 
 amazon.com.au###buyNow_feature_div
 
@@ -92,6 +96,9 @@ nix-community.github.io##html,body:style(background:#000 !important)
 nix-community.github.io##pre,div.toc,div.note:style(background:#111 !important;color:#ccc !important;padding:0.5rem !important;)
 nix-community.github.io##code.option:style(font-weight:bold !important;)
 nix-community.github.io##code.filename > a:style(color:#93ff93 !important;)
+
+! discourse.nixos.org has a div that prevents scrolling horizontally when javascript is disabled
+discourse.nixos.org##.wrap.container
 
 ! centre daniel's site to reduce neck strain when reading it
 daniel.haxx.se##.site:style(margin:auto !important)
