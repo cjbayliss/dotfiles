@@ -450,6 +450,22 @@
         #tabbrowser-tabs:not([secondarytext-unsupported]) .tab-label-container {
           height: var(--tab-min-height) !important;
         }
+
+        #unified-extensions-button {
+          opacity: 0%;
+        }
+
+        #navigator-toolbox:hover #unified-extensions-button {
+          opacity: 100%;
+        }
+
+        #alltabs-button {
+          opacity: 0%;
+        }
+
+        #navigator-toolbox:hover #alltabs-button {
+          opacity: 100%;
+        }
       '';
     };
   };
