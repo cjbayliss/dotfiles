@@ -110,13 +110,4 @@
       ls = "ls --hyperlink --color=auto";
     };
   };
-
-  home.sessionVariables = {
-    PAGER = "cat"; # NOTE: setting no pager breaks bad software
-    MANPAGER = "less --mouse --wheel-lines 3";
-    MANWIDTH = 72;
-
-    EMAIL = "cjbdev@icloud.com";
-    NAME = "Christopher Bayliss";
-  };
 }

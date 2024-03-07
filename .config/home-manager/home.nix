@@ -26,5 +26,8 @@
 
     # unfree
     ./unfree.nix
+
+    # variables
+    ./variables.nix
   ];
 }

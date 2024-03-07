@@ -14,7 +14,7 @@
   home.file.".config/sx/sxrc" = {
     text = ''
       #!/bin/sh
-      source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
+      source ${config.xdg.stateHome}/nix/profile/etc/profile.d/hm-session-vars.sh
       xrdb -load "$XDG_CONFIG_HOME/sx/xresources"
 
       systemctl --user restart picom
