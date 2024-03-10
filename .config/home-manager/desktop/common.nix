@@ -35,6 +35,15 @@
     wineWowPackages.stagingFull
   ];
 
+  home.pointerCursor = {
+    gtk.enable = true;
+    x11.enable = true;
+
+    name = "Yaru";
+    package = pkgs.yaru-theme;
+    size = 24;
+  };
+
   gtk = {
     enable = true;
 
@@ -49,6 +58,22 @@
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = true;
       gtk-decoration-layout = "menu:";
+    };
+
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+      gtk-decoration-layout = "menu:";
+      gtk-hint-font-metrics = true;
+    };
+
+    theme = {
+      name = "Yaru-blue";
+      package = pkgs.yaru-theme;
+    };
+
+    iconTheme = {
+      name = "Yaru";
+      package = pkgs.yaru-theme;
     };
   };
 }

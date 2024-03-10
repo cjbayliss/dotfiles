@@ -37,9 +37,6 @@
   xresources = {
     path = "${config.xdg.configHome}/sx/xresources";
     properties = {
-      "Xcursor.size" = 32;
-      "Xcursor.theme" = "Yaru";
-
       "Xft.dpi" = 108;
       "Xft.autohint" = 0;
       "Xft.lcdfilter" = "lcddefault";
