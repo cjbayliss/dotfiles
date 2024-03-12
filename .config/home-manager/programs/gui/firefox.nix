@@ -6,12 +6,14 @@
       Cookies = {
         Allow = [
           "https://amazon.com.au"
+          "https://apple.com"
           "https://codeberg.org"
           "https://ebay.com.au"
           "https://github.com"
           "https://gitlab.com"
           "https://icloud.com"
           "https://macquarie.com.au"
+          "https://music.apple.com"
           "https://openai.com"
           "https://selfwealth.com.au"
           "https://youtube.com"
