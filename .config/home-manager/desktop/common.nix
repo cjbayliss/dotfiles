@@ -39,8 +39,8 @@
     gtk.enable = true;
     x11.enable = true;
 
-    name = "Yaru";
-    package = pkgs.yaru-theme;
+    name = "breeze_cursors";
+    package = pkgs.kdePackages.breeze;
     size = 24;
   };
 
@@ -67,13 +67,19 @@
     };
 
     theme = {
-      name = "Yaru-blue";
-      package = pkgs.yaru-theme;
+      name = "Breeze-Dark";
+      package = pkgs.kdePackages.breeze-gtk;
     };
 
     iconTheme = {
-      name = "Yaru";
-      package = pkgs.yaru-theme;
+      name = "breeze-dark";
+      package = pkgs.kdePackages.breeze-icons;
+    };
+  };
+
+  dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
     };
   };
 }
