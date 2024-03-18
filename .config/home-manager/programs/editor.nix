@@ -1,7 +1,24 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
+    ansible-language-server
+    clang-tools
+    cmake-language-server
+    dockerfile-language-server-nodejs
+    elixir-ls
+    erlang-ls
+    gleam
+    gopls
+    haskell-language-server
     lua-language-server
     nil
+    nodePackages.bash-language-server
+    nodePackages.typescript-language-server
+    racket
+    rust-analyzer
+    taplo
+    vscode-langservers-extracted
+    yaml-language-server
+    zls
   ];
 
   programs.helix = {
