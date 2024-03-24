@@ -26,15 +26,11 @@ def fetch_holiday_data(url: str) -> List[str]:
 
 def generate_holiday_list(csv_dict: csv.DictReader) -> List[Tuple[date, str]]:
     """Return the holiday array"""
-    today = date.today()
     holidays = [
         (date.fromisoformat(row["Date"]), row["Holiday Name"])
         for row in csv_dict
         if row["Jurisdiction"] == "vic"
     ]
-
-    if all(holiday_date != today for holiday_date, _ in holidays):
-        holidays.append((today, "Today"))
 
     holidays.sort(key=lambda x: x[0])
     return holidays
@@ -46,9 +42,7 @@ def print_holidays(holiday_list: List[Tuple[date, str]]) -> None:
     print("-" * 42)
     for holiday_date, holiday_name in holiday_list:
         if holiday_date == date.today():
-            print(
-                f"{BOLD}{ITALIC}{CYAN}{holiday_date.isoformat():<12} {holiday_name:<30}{RESET}"
-            )
+            print(f"{BOLD}{ITALIC}{CYAN}{'TODAY':<12} {holiday_name:<30}{RESET}")
         else:
             print(f"{holiday_date.isoformat():<12} {holiday_name:<30}")
 
