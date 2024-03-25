@@ -3,7 +3,7 @@
 ! Description: |
 !       my custom ublock list
 ! Expires: 7 days
-! Last modified: 2024-03-04T21:15:37+00:00
+! Last modified: 2024-03-25T20:08:46+00:00
 ! Homepage: https://github.com/cjbayliss/dotfiles
 
 ! all
@@ -105,6 +105,7 @@ daniel.haxx.se##.site:style(margin:auto !important)
 
 ! sticky toc fixes
 nix.dev##.bd-sidebar-primary:style(position:unset !important;max-height:unset !important;display:unset !important;)
+wiki.archlinux.org###vector-toc-pinned-container,.vector-toc:style(position:unset !important;max-height:unset !important;max-height:unset !important;)
 wikipedia.org##.vector-sticky-pinned-container:style(position:unset !important;max-height:unset !important;)
 
 ! accessibilty fixes
